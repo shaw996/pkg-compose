@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+if [ $# -eq 1 ]; then
+  echo 'Use git-cz'
+  exec < /dev/tty && pnpm git-cz --hook
+else
+  echo 'Skip git-cz'
+fi

@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+pnpm commitlint --config .commitlintrc.cjs --edit $1
