@@ -1,24 +1,63 @@
 {
   "name": "shawkit",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky install"
-  },
-  "keywords": [],
-  "author": "",
+  "private": false,
+  "type": "module",
   "license": "MIT",
-  "engines": {
-    "pnpm": ">=9.x",
-    "node": ">=20.10.x"
+  "version": "0.0.1",
+  "homepage": "https://github.com/shaw996/shawkit#readme",
+  "description": "A CLI contains some development kits of Shaw996",
+  "keywords": [
+    "CLI",
+    "Integration",
+    "Tool",
+    "Add Dependencies"
+  ],
+  "author": {
+    "name": "Shaw996",
+    "email": "shawliu996@gmail.com"
   },
-  "packageManager": "pnpm@9.4.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shaw996/shawkit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/shaw996/shawkit/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "dist"
+  ],
+  "bin": {
+    "shawkit": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "prepare": "husky install",
+    "dev": "tsup --watch",
+    "build": "tsup",
+    "shawkit": "npx shawkit",
+    "compose": "npx shawkit compose",
+    "composeinit": "npx shawkit compose init"
+  },
+  "dependencies": {
+    "@clack/prompts": "0.7.0",
+    "chalk": "5.3.0",
+    "commander": "12.1.0",
+    "gradient-string": "2.0.2",
+    "ora": "8.1.0",
+    "tinycolor2": "1.6.0"
+  },
   "devDependencies": {
     "@commitlint/cli": "19.4.0",
     "@commitlint/config-conventional": "19.2.2",
+    "@types/gradient-string": "1.1.6",
     "@types/node": "22.5.0",
+    "@types/tinycolor2": "1.4.6",
     "@typescript-eslint/eslint-plugin": "8.2.0",
     "commitizen": "4.3.0",
     "commitlint-plugin-function-rules": "4.0.0",
@@ -34,6 +73,7 @@
     "git-cz": "4.9.0",
     "husky": "9.1.5",
     "lint-staged": "15.2.9",
+    "nextui-cli": "0.3.4",
     "prettier": "3.3.3",
     "tsup": "8.2.4",
     "typescript": "5.5.4"
@@ -42,5 +82,10 @@
     "commitizen": {
       "path": "./node_modules/git-cz"
     }
-  }
+  },
+  "engines": {
+    "pnpm": ">=9.x",
+    "node": ">=20.10.x"
+  },
+  "packageManager": "pnpm@9.4.0"
 }

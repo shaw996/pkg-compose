@@ -31,7 +31,11 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
+    "paths": {
+      "@/*": ["src/*"],
+      "@helpers/*": ["src/helpers/*"]
+    }
   },
   "include": ["**/*.js", "**/*.cjs", "**/*.mjs", "**/*.ts", "**/*.tsx", "**/*.d.ts"],
   "exclude": [".github", ".husky", "dist", "node_modules"]
