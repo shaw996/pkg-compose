@@ -17,6 +17,12 @@ export const getCommandDescAndLog = (log: string, desc: string): string => {
   return desc;
 };
 
+/**
+ * Create ora spinner
+ * @param hint
+ * @param interval
+ * @returns
+ */
 export const createOraSpinner = (hint?: string, interval?: number): Ora => {
   hint = hint ?? '';
   interval = interval ?? 200;
