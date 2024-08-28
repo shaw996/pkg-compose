@@ -52,7 +52,8 @@
     "gradient-string": "2.0.2",
     "node-fetch-native": "1.6.4",
     "ora": "8.1.0",
-    "tinycolor2": "1.6.0"
+    "tinycolor2": "1.6.0",
+    "yaml": "2.5.0"
   },
   "devDependencies": {
     "@commitlint/cli": "19.4.0",

@@ -32,6 +32,9 @@ importers:
       tinycolor2:
         specifier: 1.6.0
         version: 1.6.0
+      yaml:
+        specifier: 2.5.0
+        version: 2.5.0
     devDependencies:
       '@commitlint/cli':
         specifier: 19.4.0

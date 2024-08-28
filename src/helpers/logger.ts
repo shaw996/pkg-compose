@@ -11,7 +11,7 @@ export const gradientString = _gradientString(...defaultColors);
 const logPrefix = gradientString('Shaw Kit CLI:');
 
 /**
- * Prints commonly
+ * Print commonly
  * @param args
  */
 export const log = (...args: Parameters<typeof console.log>) => {
@@ -19,7 +19,7 @@ export const log = (...args: Parameters<typeof console.log>) => {
 };
 
 /**
- * Prints commonly and insert prefix in front
+ * Print commonly and insert prefix in front
  * @param args
  */
 export const logWithPrefix = (...args: Parameters<typeof console.log>) => {
@@ -27,7 +27,7 @@ export const logWithPrefix = (...args: Parameters<typeof console.log>) => {
 };
 
 /**
- * Prints error
+ * Print error
  * @param args
  */
 export const error = (...args: Parameters<typeof console.error>) => {
@@ -35,7 +35,7 @@ export const error = (...args: Parameters<typeof console.error>) => {
 };
 
 /**
- * Prints error and insert prefix in front
+ * Print error and insert prefix in front
  * @param args
  */
 export const errorWithPrefix = (...args: Parameters<typeof console.error>) => {
@@ -43,7 +43,7 @@ export const errorWithPrefix = (...args: Parameters<typeof console.error>) => {
 };
 
 /**
- * Prints info with gradient colors
+ * Print info with gradient colors
  * @param content
  * @param options
  */
@@ -55,7 +55,7 @@ export const gradient = (
 };
 
 /**
- * Prints info with gradient colors and insert prefix in front
+ * Print info with gradient colors and insert prefix in front
  * @param content
  * @param options
  */
