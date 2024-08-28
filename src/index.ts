@@ -8,7 +8,7 @@ import pkg from '../package.json';
 import { composeAction, composeInitAction } from './actions/compose-action';
 import { error, log, newLine } from './helpers/logger';
 import { matchMostSimilarString } from './helpers/matcher';
-import { getCommandDescAndLog, oraExecCmd } from './helpers/utils';
+import { execCmd, getCommandDescAndLog } from './helpers/utils';
 
 const commandList: CommandName[] = ['compose'];
 
@@ -42,7 +42,7 @@ shawkit
 
     if (!isArgs) {
       // const helpInfo = await oraExecCmd('shawkit --help');
-      const helpInfo = await oraExecCmd('npm run test -- --help');
+      const helpInfo = await execCmd('npm run test -- --help');
 
       const helpInfoArr = helpInfo
         .split('\n')

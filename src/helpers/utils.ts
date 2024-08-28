@@ -1,18 +1,25 @@
 import { exec } from 'node:child_process';
 
 import chalk from 'chalk';
-import ora from 'ora';
+import ora, { type Ora } from 'ora';
 
 import { error, gradient } from './logger';
 
-export function getCommandDescAndLog(log: string, desc: string): string {
+/**
+ * Prints log and return desc
+ * @param log
+ * @param desc
+ * @returns
+ */
+export const getCommandDescAndLog = (log: string, desc: string): string => {
   gradient(log);
 
   return desc;
-}
+};
 
-export async function oraExecCmd(cmd: string, hint?: string) {
-  hint = hint ?? `Executing ${cmd}`;
+export const createOraSpinner = (hint?: string, interval?: number): Ora => {
+  hint = hint ?? '';
+  interval = interval ?? 200;
 
   const spinner = ora({
     // Open ctrl + c cancel
@@ -30,12 +37,25 @@ export async function oraExecCmd(cmd: string, hint?: string) {
         `⠇ ${chalk.gray(`${hint}...`)}`,
         `⠏ ${chalk.gray(`${hint}.`)}`,
       ],
-      interval: 150,
+      interval: interval,
     },
   });
 
   spinner.start();
 
+  return spinner;
+};
+
+/**
+ * Execute command friendly
+ * @param cmd
+ * @param hint
+ * @returns
+ */
+export const execCmd = async (cmd: string, hint?: string) => {
+  hint = hint ?? `Executing ${cmd}`;
+
+  const spinner = createOraSpinner(hint);
   const result = await new Promise((resolve) => {
     exec(cmd, (err, stdout) => {
       if (err) {
@@ -50,4 +70,4 @@ export async function oraExecCmd(cmd: string, hint?: string) {
   spinner.stop();
 
   return result as string;
-}
+};

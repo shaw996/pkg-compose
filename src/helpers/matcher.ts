@@ -1,4 +1,10 @@
-function calculateSimilarCore(pattern: string, text: string): number {
+/**
+ * Record the similar score
+ * @param pattern
+ * @param text
+ * @returns
+ */
+function calculateSimilarScore(pattern: string, text: string): number {
   // TODO 改为编辑距离算法 -- Levenshtein Distance
   let score = 0;
   const patternLength = pattern.length;
@@ -19,12 +25,18 @@ function calculateSimilarCore(pattern: string, text: string): number {
   return score;
 }
 
+/**
+ * Find the most similar string in a collection
+ * @param pattern
+ * @param list
+ * @returns
+ */
 export function matchMostSimilarString(pattern: string, list: string[]): string {
   let maxScore = 0;
   let result = '';
 
   list.forEach((text) => {
-    const score = calculateSimilarCore(pattern, text);
+    const score = calculateSimilarScore(pattern, text);
 
     if (score > maxScore) {
       maxScore = score;

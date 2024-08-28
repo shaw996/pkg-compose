@@ -5,7 +5,7 @@ export default defineConfig((options) => {
     banner: { js: '#!/usr/bin/env node' },
     clean: true,
     dts: true,
-    entry: ['src/index.ts'],
+    entry: ['src/index.ts', 'src/helpers/downloader.ts'],
     format: ['esm'],
     minify: !options.watch,
     outDir: 'dist',
