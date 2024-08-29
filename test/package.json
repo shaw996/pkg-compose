@@ -9,7 +9,11 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.4.0",
+    "@commitlint/config-conventional": "^19.2.2",
+    "commitizen": "^4.3.0",
     "git-cz": "^4.9.0",
+    "husky": "^9.1.5",
     "shawkit": "file:shawkit-0.0.1.tgz"
   },
   "author": "",

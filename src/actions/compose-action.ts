@@ -72,29 +72,28 @@ export const composeRunAction = async (options: ComposeRunActionOptions) => {
     clackLog.info(chalk.grey(description));
   }
 
-  await Promise.all(
-    Object.values(devDependencies).map(
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
-      async ({ description: depDesc, name: depName, packageJson, version }) => {
-        const fullDepName = `${depName}@${version}`;
+  const deps = Object.values(devDependencies);
 
-        clackLog.step(`Installing ${fullDepName}`);
+  for await (const dep of deps) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
+    const { description: depDesc, name: depName, packageJson, version } = dep;
+    const fullDepName = `${depName}@${version}`;
 
-        if (depDesc) {
-          clackLog.info(chalk.grey(depDesc));
-        }
+    clackLog.step(`Installing ${fullDepName}`);
 
-        await execCmd(`${manager} install -D ${fullDepName}`, {
-          fail: (errMsg) => {
-            clackLog.error(chalk.redBright(`Failed to install ${fullDepName}\n${errMsg}`));
-          },
-          success: () => {
-            clackLog.success(chalk.greenBright(`Installed ${fullDepName} successfully`));
-          },
-        });
+    if (depDesc) {
+      clackLog.info(chalk.grey(depDesc));
+    }
+
+    await execCmd(`${manager} install -D ${fullDepName}`, {
+      fail: (errMsg) => {
+        clackLog.error(chalk.redBright(`Failed to install ${fullDepName}\n${errMsg}`));
       },
-    ),
-  );
+      success: () => {
+        clackLog.success(chalk.greenBright(`Installed ${fullDepName} successfully`));
+      },
+    });
+  }
 
   outro(chalk.greenBright('Installed all devDependencies'));
 };
