@@ -5,7 +5,7 @@ import { Command } from 'commander';
 
 import pkg from '../package.json';
 
-import { composeAction, composeInitAction } from './actions/compose-action';
+import { composeInitAction, composeRunAction } from './actions/compose-action';
 import { error, log, newLine } from './helpers/logger';
 import { matchMostSimilarString } from './helpers/matcher';
 import { execCmd, getCommandDescAndLog } from './helpers/utils';
@@ -67,12 +67,17 @@ shawkit
     process.exit(0);
   });
 
-shawkit
+const composeCommand = shawkit
   .command('compose')
-  .description('Integrating npm packages into project step by step')
+  .description('Integrating npm packages into project step by step');
+
+// run
+composeCommand
+  .command('run')
   .option('-c --config [string]', 'Specify a configuration file, e.g., ./package-compose.yaml')
-  .action(composeAction)
-  // init
+  .action(composeRunAction);
+// init
+composeCommand
   .command('init')
   .description('Create a template of package-compose.yaml')
   .action(composeInitAction);

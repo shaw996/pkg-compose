@@ -32,16 +32,16 @@ export const createOraSpinner = (hint?: string, interval?: number): Ora => {
     discardStdin: false,
     spinner: {
       frames: [
-        `⠋ ${chalk.gray(`${hint}.`)}`,
-        `⠙ ${chalk.gray(`${hint}..`)}`,
-        `⠹ ${chalk.gray(`${hint}...`)}`,
-        `⠸ ${chalk.gray(`${hint}.`)}`,
-        `⠼ ${chalk.gray(`${hint}..`)}`,
-        `⠴ ${chalk.gray(`${hint}...`)}`,
-        `⠦ ${chalk.gray(`${hint}.`)}`,
-        `⠧ ${chalk.gray(`${hint}..`)}`,
-        `⠇ ${chalk.gray(`${hint}...`)}`,
-        `⠏ ${chalk.gray(`${hint}.`)}`,
+        `⠋  ${chalk.gray(`${hint}.`)}`,
+        `⠙  ${chalk.gray(`${hint}..`)}`,
+        `⠹  ${chalk.gray(`${hint}...`)}`,
+        `⠸  ${chalk.gray(`${hint}.`)}`,
+        `⠼  ${chalk.gray(`${hint}..`)}`,
+        `⠴  ${chalk.gray(`${hint}...`)}`,
+        `⠦  ${chalk.gray(`${hint}.`)}`,
+        `⠧  ${chalk.gray(`${hint}..`)}`,
+        `⠇  ${chalk.gray(`${hint}...`)}`,
+        `⠏  ${chalk.gray(`${hint}.`)}`,
       ],
       interval: interval,
     },
@@ -52,28 +52,56 @@ export const createOraSpinner = (hint?: string, interval?: number): Ora => {
   return spinner;
 };
 
+export interface ExecCmdOptions {
+  timeout?: number;
+  hint?: string;
+  success?: () => void;
+  fail?: (errMsg: string) => void;
+}
+
 /**
  * Execute command friendly
  * @param cmd
  * @param hint
  * @returns
  */
-export const execCmd = async (cmd: string, hint?: string) => {
-  hint = hint ?? `Executing ${cmd}`;
+export const execCmd = async (cmd: string, execCmdOptions?: ExecCmdOptions) => {
+  let timeout = 500;
+  let hint = `Excuting ${cmd}`;
+  let success: ExecCmdOptions['success'];
+  let fail: ExecCmdOptions['fail'];
+
+  if (execCmdOptions) {
+    timeout = execCmdOptions.timeout ?? timeout;
+    hint = execCmdOptions.hint ?? hint;
+    success = execCmdOptions.success;
+    fail = execCmdOptions.fail;
+  }
 
   const spinner = createOraSpinner(hint);
   const result = await new Promise((resolve) => {
     exec(cmd, (err, stdout) => {
       if (err) {
-        error(`Exec cmd ${cmd} error`);
+        if (fail) {
+          fail(err.message);
+        } else {
+          error(`Excute ${cmd} failed\n${err.message}`);
+        }
         process.exit(1);
       }
 
-      resolve(stdout.trim());
+      setTimeout(() => {
+        resolve(stdout.trim());
+      }, timeout);
     });
   });
 
-  spinner.stop();
+  if (success) {
+    spinner.stop();
+    success();
+  } else {
+    spinner.succeed(` Excute ${cmd} successfully`);
+  }
 
   return result as string;
 };
