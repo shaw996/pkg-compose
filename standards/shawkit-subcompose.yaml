@@ -1,9 +1,3 @@
-name: shawkit
-description: main package-compose of shawkit
-engine:
-  node: '>= 20.10.0'
-  pnpm: '>= 9.4.0'
-  npm: '>= 10.2.3'
 # TODO 统一收集packageJson，统一修改
 devDependencies:
   commitizen:
@@ -39,7 +33,3 @@ configurations:
   husky:
     - .husky/prepare-commit-msg
     - .husky/commit-msg
-subComposes:
-  - name: standards
-    description: 前端代码规范
-    location: ./standards
