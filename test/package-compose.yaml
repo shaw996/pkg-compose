@@ -7,6 +7,8 @@ devDependencies:
     name: commitizen
     version: 4.3.0
     description: 用于规范化Git提交消息的工具
+    configurations:
+      - standards/test.txt
   git-cz:
     name: git-cz
     version: 4.9.0
@@ -15,6 +17,8 @@ devDependencies:
       config:
         commitizen:
           path: ./node_modules/git-cz
+    configurations:
+      - standards/changelog.config.js
   '@commitlint/config-conventional':
     name: '@commitlint/config-conventional'
     version: 19.2.2
@@ -23,17 +27,16 @@ devDependencies:
     name: '@commitlint/cli'
     version: 19.4.0
     description: 用于检查 Git 提交消息是否符合约定式提交（Conventional Commits）规范的命令行工具
+    configurations:
+      - standards/commitlint.config.js
   husky:
     name: husky
     version: 9.1.5
     description: 用于在 Git 操作（如 commit、push 等）之前或之后运行脚本的工具
+    postinstall: npx husky install
     packageJson:
       scripts:
         prepare: npx husky install
-# configurations:
-#   test: standards/test.txt
-# git-cz: standards/changelog.config.js
-# '@commitlint/cli': standards/commitlint.config.js
-# husky:
-#   - standards/.husky/prepare-commit-msg
-#   - standards/.husky/commit-msg
+    configurations:
+      - standards/.husky/prepare-commit-msg
+      - standards/.husky/commit-msg

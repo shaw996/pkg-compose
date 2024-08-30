@@ -11,7 +11,7 @@ import { error, gradient } from './logger';
  * @param desc
  * @returns
  */
-export const getCommandDescAndLog = (log: string, desc: string): string => {
+export const printLogAndReturnDesc = (log: string, desc: string): string => {
   gradient(log);
 
   return desc;
@@ -52,7 +52,7 @@ export const createOraSpinner = (hint?: string, interval?: number): Ora => {
   return spinner;
 };
 
-export interface ExecCmdOptions {
+export interface RunCmdOptions {
   timeout?: number;
   hint?: string;
   success?: () => void;
@@ -60,22 +60,22 @@ export interface ExecCmdOptions {
 }
 
 /**
- * Execute command friendly
+ * Run command friendly
  * @param cmd
  * @param hint
  * @returns
  */
-export const execCmd = async (cmd: string, execCmdOptions?: ExecCmdOptions) => {
+export const runCmd = async (cmd: string, runCmdOptions?: RunCmdOptions) => {
   let timeout = 500;
-  let hint = `Excuting ${cmd}`;
-  let success: ExecCmdOptions['success'];
-  let fail: ExecCmdOptions['fail'];
+  let hint = `Running ${cmd}`;
+  let success: RunCmdOptions['success'];
+  let fail: RunCmdOptions['fail'];
 
-  if (execCmdOptions) {
-    timeout = execCmdOptions.timeout ?? timeout;
-    hint = execCmdOptions.hint ?? hint;
-    success = execCmdOptions.success;
-    fail = execCmdOptions.fail;
+  if (runCmdOptions) {
+    timeout = runCmdOptions.timeout ?? timeout;
+    hint = runCmdOptions.hint ?? hint;
+    success = runCmdOptions.success;
+    fail = runCmdOptions.fail;
   }
 
   const spinner = createOraSpinner(hint);
@@ -85,7 +85,7 @@ export const execCmd = async (cmd: string, execCmdOptions?: ExecCmdOptions) => {
         if (fail) {
           fail(err.message);
         } else {
-          error(`Excute ${cmd} failed\n${err.message}`);
+          error(`Run "${cmd}" failed\n${err.message}`);
         }
         process.exit(1);
       }
@@ -100,7 +100,7 @@ export const execCmd = async (cmd: string, execCmdOptions?: ExecCmdOptions) => {
     spinner.stop();
     success();
   } else {
-    spinner.succeed(` Excute ${cmd} successfully`);
+    spinner.succeed(` Run "${cmd}" successfully`);
   }
 
   return result as string;

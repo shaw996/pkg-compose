@@ -1,3 +1,7 @@
+/* eslint-disable unused-imports/no-unused-imports */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { SAFE_ANY } from '@/helpers/type';
+
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
@@ -5,12 +9,12 @@ import { log as clackLog, intro, outro } from '@clack/prompts';
 import chalk from 'chalk';
 import { parse } from 'yaml';
 
-import { execCmd } from '@/helpers/utils';
+import { runCmd } from '@/helpers/utils';
 import { shawConfirm } from '@/prompts/shaw';
 
 const COMPOSE_FILE_NAME = 'package-compose.yaml';
 const COMPOSE_FILE_PATH = path.resolve(process.cwd(), `./${COMPOSE_FILE_NAME}`);
-// TODO 更新模版
+// TODO Update template
 const COMPOSE_FILE_TEMPLATE = `{
 name: shawkit
 description: main package-compose of shawkit
@@ -24,8 +28,6 @@ groups:
     description: 前端代码规范
     url: ./standards
 `;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
-// const GROUP_FILE_NAME = 'shawkit-group.yaml';
 
 const createPackageCompose = () => {
   writeFileSync(COMPOSE_FILE_NAME, COMPOSE_FILE_TEMPLATE, { encoding: 'utf-8' });
@@ -39,6 +41,8 @@ interface ComposeDepOptions {
   name: string;
   version: string;
   description: string;
+  postinstall?: string;
+  configurations?: string[];
   packageJson?: object;
 }
 
@@ -59,7 +63,6 @@ export const composeRunAction = async (options: ComposeRunActionOptions) => {
   const yamlString = readFileSync(COMPOSE_FILE_PATH, { encoding: 'utf-8' });
   const {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
-    configurations = {},
     description,
     devDependencies = {},
     manager = 'npm',
@@ -73,26 +76,82 @@ export const composeRunAction = async (options: ComposeRunActionOptions) => {
   }
 
   const deps = Object.values(devDependencies);
+  const cmdsRunFailed: (string | null)[] = [];
+  let cmdsRunFailedCount = 0;
 
+  // Install dependencies in order
   for await (const dep of deps) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
-    const { description: depDesc, name: depName, packageJson, version } = dep;
+    const {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
+      configurations,
+      description: depDesc,
+      name: depName,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
+      packageJson,
+      postinstall,
+      version,
+    } = dep;
     const fullDepName = `${depName}@${version}`;
 
-    clackLog.step(`Installing ${fullDepName}`);
+    clackLog.step(`${fullDepName}: Installing`);
 
     if (depDesc) {
       clackLog.info(chalk.grey(depDesc));
     }
 
-    await execCmd(`${manager} install -D ${fullDepName}`, {
-      fail: (errMsg) => {
-        clackLog.error(chalk.redBright(`Failed to install ${fullDepName}\n${errMsg}`));
-      },
-      success: () => {
-        clackLog.success(chalk.greenBright(`Installed ${fullDepName} successfully`));
-      },
-    });
+    // Run installation command
+    const cmd = `${manager} install -D ${fullDepName}`;
+    const cmdsRunFailedScoped: typeof cmdsRunFailed = [];
+
+    try {
+      await runCmd(cmd, {
+        fail: (errMsg) => {
+          cmdsRunFailedScoped.unshift(cmd);
+          clackLog.error(chalk.redBright(`Failed to install ${fullDepName}\n${errMsg}`));
+        },
+        success: () => {
+          clackLog.success(chalk.greenBright(`Installed ${fullDepName} successfully`));
+        },
+      });
+    } catch (err: SAFE_ANY) {
+      // I don't expect to be blocked after running command failed.
+      cmdsRunFailedScoped.unshift(cmd);
+      clackLog.error(chalk.redBright(`Failed to run ${cmd}\n${err?.message ?? 'Unknown Error'}`));
+    }
+
+    // Run postinstall
+    if (postinstall) {
+      clackLog.step(`Running postinstall`);
+      try {
+        await runCmd(postinstall, {
+          fail: (errMsg) => {
+            cmdsRunFailedScoped.unshift(cmd);
+            clackLog.error(chalk.redBright(`Failed to run postinstall\n${errMsg}`));
+          },
+          success: () => {
+            clackLog.success(chalk.greenBright(`Run postinstall successfully`));
+          },
+        });
+      } catch (err: SAFE_ANY) {
+        // I don't expect to be blocked after running postinstall failed.
+        cmdsRunFailedScoped.unshift(cmd);
+        clackLog.error(
+          chalk.redBright(`Failed to run postinstall\n${err?.message ?? 'Unknown Error'}`),
+        );
+      }
+    }
+
+    if (cmdsRunFailedScoped.length) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
+      cmdsRunFailedCount += cmdsRunFailedScoped.length;
+
+      // Splits the commands ran failed of each dependency
+      cmdsRunFailedScoped.unshift(null);
+      cmdsRunFailedScoped.push(fullDepName);
+      cmdsRunFailedScoped.reverse(); // Order
+
+      cmdsRunFailed.push(...cmdsRunFailedScoped);
+    }
   }
 
   outro(chalk.greenBright('Installed all devDependencies'));

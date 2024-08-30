@@ -8,7 +8,7 @@ import pkg from '../package.json';
 import { composeInitAction, composeRunAction } from './actions/compose-action';
 import { error, log, newLine } from './helpers/logger';
 import { matchMostSimilarString } from './helpers/matcher';
-import { execCmd, getCommandDescAndLog } from './helpers/utils';
+import { printLogAndReturnDesc, runCmd } from './helpers/utils';
 
 const commandList: CommandName[] = ['compose'];
 
@@ -17,7 +17,7 @@ const shawkit = new Command();
 shawkit
   .name('shawkit')
   .usage('[command]')
-  .description(getCommandDescAndLog(`\nShaw Kit CLI v${pkg.version}\n`, ''))
+  .description(printLogAndReturnDesc(`\nShaw Kit CLI v${pkg.version}\n`, 'CLI helper for personal'))
   .version(pkg.version, '-v, --version', 'Output the current version')
   .helpOption('-h, --help', 'Display help for command')
   .allowUnknownOption()
@@ -41,8 +41,10 @@ shawkit
     }
 
     if (!isArgs) {
-      // const helpInfo = await oraExecCmd('shawkit --help');
-      const helpInfo = await execCmd('npm run test -- --help');
+      // If no arguments then run "shawkit --help" to display help list
+      // TODO Not run "npm run test"
+      // const helpInfo = await runCmd('shawkit --help');
+      const helpInfo = await runCmd('npm run test -- --help');
 
       const helpInfoArr = helpInfo
         .split('\n')
