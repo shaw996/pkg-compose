@@ -43,14 +43,14 @@ interface ComposeDepOptions {
   description: string;
   postinstall?: string;
   configurations?: string[];
-  packageJson?: object;
+  package_json?: object;
 }
 
 export interface ComposeOptions {
   name: string;
   description: string;
   manager: 'npm' | 'yarn' | 'pnpm';
-  devDependencies?: {
+  dev_dependencies?: {
     [name: string]: ComposeDepOptions;
   };
   configurations?: {
@@ -64,7 +64,7 @@ export const composeRunAction = async (options: ComposeRunActionOptions) => {
   const {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
     description,
-    devDependencies = {},
+    dev_dependencies = {},
     manager = 'npm',
     name,
   } = parse(yamlString) as ComposeOptions;
@@ -75,7 +75,7 @@ export const composeRunAction = async (options: ComposeRunActionOptions) => {
     clackLog.info(chalk.grey(description));
   }
 
-  const deps = Object.values(devDependencies);
+  const deps = Object.values(dev_dependencies);
   const cmdsRunFailed: (string | null)[] = [];
   let cmdsRunFailedCount = 0;
 
@@ -87,7 +87,7 @@ export const composeRunAction = async (options: ComposeRunActionOptions) => {
       description: depDesc,
       name: depName,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
-      packageJson,
+      package_json,
       postinstall,
       version,
     } = dep;

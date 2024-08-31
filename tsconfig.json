@@ -2,8 +2,6 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "module": "ESNext",
-    "baseUrl": ".",
-    "rootDir": ".",
     "lib": ["ESNext"],
     "target": "ES2019",
     "moduleDetection": "auto",
@@ -31,12 +29,6 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "verbatimModuleSyntax": true,
-    "paths": {
-      "@/*": ["src/*"],
-      "@helpers/*": ["src/helpers/*"]
-    }
-  },
-  "include": ["**/*.js", "**/*.cjs", "**/*.mjs", "**/*.ts", "**/*.tsx", "**/*.d.ts"],
-  "exclude": [".github", ".husky", "dist", "node_modules"]
+    "verbatimModuleSyntax": true
+  }
 }

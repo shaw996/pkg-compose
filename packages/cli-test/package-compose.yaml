@@ -1,8 +1,8 @@
-name: shawkit
-description: main package-compose of shawkit
-manager: 'npm'
+name: Git commit规范工具集合
+description: 用于约定git commit规范的工具
+manager: 'pnpm'
 # TODO 统一收集packageJson，统一修改
-devDependencies:
+dev_dependencies:
   commitizen:
     name: commitizen
     version: 4.3.0
@@ -13,7 +13,7 @@ devDependencies:
     name: git-cz
     version: 4.9.0
     description: 用于帮助开发者创建符合约定式提交（Conventional Commits）规范的 Git 提交消息
-    packageJson:
+    package_json:
       config:
         commitizen:
           path: ./node_modules/git-cz
@@ -34,7 +34,7 @@ devDependencies:
     version: 9.1.5
     description: 用于在 Git 操作（如 commit、push 等）之前或之后运行脚本的工具
     postinstall: npx husky install
-    packageJson:
+    package_json:
       scripts:
         prepare: npx husky install
     configurations:
