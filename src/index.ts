@@ -1,16 +1,10 @@
-import type { CommandName } from '@helpers/type';
-
-import chalk from 'chalk';
 import { Command } from 'commander';
 
 import pkg from '../package.json';
 
 import { composeInitAction, composeRunAction } from './actions/compose-action';
 import { error, log, newLine } from './helpers/logger';
-import { matchMostSimilarString } from './helpers/matcher';
-import { printLogAndReturnDesc, runCmd } from './helpers/utils';
-
-const commandList: CommandName[] = ['compose'];
+import { createDefaultAction, printLogAndReturnDesc } from './helpers/utils';
 
 const shawkit = new Command();
 
@@ -21,68 +15,31 @@ shawkit
   .version(pkg.version, '-v, --version', 'Output the current version')
   .helpOption('-h, --help', 'Display help for command')
   .allowUnknownOption()
-  .action(async (_, command) => {
-    let isArgs = false;
-
-    if (command) {
-      const arg = command.args?.[0];
-
-      if (arg && !commandList.includes(arg)) {
-        isArgs = true;
-
-        const matchCommand = matchMostSimilarString(arg, commandList);
-
-        if (matchCommand) {
-          error(`Unknown command '${arg}'. Did you mean '${chalk.underline(matchCommand)}'?`);
-        } else {
-          error(`Unknown command '${arg}'`);
-        }
-      }
-    }
-
-    if (!isArgs) {
-      // If no arguments then run "shawkit --help" to display help list
-      // TODO Not run "npm run test"
-      // const helpInfo = await runCmd('shawkit --help');
-      const helpInfo = await runCmd('npm run test -- --help');
-
-      const helpInfoArr = helpInfo
-        .split('\n')
-        .map((info) => {
-          if (!info || info.includes('Shaw Kit CLI v') || info.startsWith('>')) {
-            return null;
-          }
-
-          const command = info.match(/(\w+)\s\[/)?.[1];
-
-          if (command) {
-            return info.replace(command, chalk.cyan(command));
-          }
-
-          return info;
-        })
-        .filter(Boolean);
-
-      log(helpInfoArr.join('\n'));
-    }
-
-    process.exit(0);
-  });
+  .action(createDefaultAction(['compose'], 'shawkit --help'));
 
 const composeCommand = shawkit
   .command('compose')
-  .description('Integrating npm packages into project step by step');
+  .description('Installing npm dependencies and generating configurations from remote')
+  .usage('[command]')
+  .helpOption('-h, --help', 'Display help for command')
+  .allowUnknownOption()
+  .action(createDefaultAction(['init', 'run'], 'shawkit compose --help'));
 
-// run
-composeCommand
-  .command('run')
-  .option('-c --config [string]', 'Specify a configuration file, e.g., ./package-compose.yaml')
-  .action(composeRunAction);
-// init
+// compose init
 composeCommand
   .command('init')
   .description('Create a template of package-compose.yaml')
   .action(composeInitAction);
+
+// compose run
+composeCommand
+  .command('run')
+  .description('Looking for .packagecomposerc and handling package-compose.yaml declared in it')
+  .option(
+    '-c --config [string]',
+    'Specify a configuration file, e.g., ./package-compose.yaml or https://[REMOTE]/package-compose.yaml',
+  )
+  .action(composeRunAction);
 
 shawkit.parseAsync(process.argv).catch(async (reason) => {
   newLine();

@@ -1,9 +1,12 @@
+import type { SAFE_ANY } from './type';
+
 import { exec } from 'node:child_process';
 
 import chalk from 'chalk';
 import ora, { type Ora } from 'ora';
 
-import { error, gradient } from './logger';
+import { error, gradient, log } from './logger';
+import { matchMostSimilarString } from './matcher';
 
 /**
  * Prints log and return desc
@@ -104,4 +107,58 @@ export const runCmd = async (cmd: string, runCmdOptions?: RunCmdOptions) => {
   }
 
   return result as string;
+};
+
+/**
+ * Create a default action which can help us to validate the command
+ * @param commandList
+ * @param helpCommand
+ * @returns
+ */
+export const createDefaultAction = (commandList: string[], helpCommand: string) => {
+  return async (_: SAFE_ANY, command: SAFE_ANY) => {
+    let isArgs = false;
+
+    if (command) {
+      const arg = command.args?.[0];
+
+      if (arg && !commandList.includes(arg)) {
+        isArgs = true;
+
+        const matchCommand = matchMostSimilarString(arg, commandList);
+
+        if (matchCommand) {
+          error(`Unknown command '${arg}'. Did you mean '${chalk.underline(matchCommand)}'?`);
+        } else {
+          error(`Unknown command '${arg}'`);
+        }
+      }
+    }
+
+    if (!isArgs) {
+      // If no arguments then run "[command] --help" to display help list
+      const helpInfo = await runCmd(`${helpCommand} --help`);
+
+      const helpInfoArr = helpInfo
+        .split('\n')
+        .map((info) => {
+          if (!info || info.includes('Shaw Kit CLI v') || info.startsWith('>')) {
+            return null;
+          }
+
+          const command = info.match(/(\w+)\s\[/)?.[1];
+
+          if (command) {
+            return info.replace(command, chalk.cyan(command));
+          }
+
+          return info;
+        })
+        .filter(Boolean);
+
+      log(helpInfoArr.join('\n'));
+    }
+
+    process.exit(0);
+  };
 };
