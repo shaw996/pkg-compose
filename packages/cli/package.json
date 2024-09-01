@@ -1,5 +1,5 @@
 {
-  "name": "cli",
+  "name": "@shawkit/cli",
   "private": false,
   "type": "module",
   "license": "MIT",

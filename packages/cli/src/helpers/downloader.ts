@@ -1,5 +1,8 @@
-import fs from 'node:fs';
-import path from 'node:path';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-imports
+import type { SAFE_ANY } from './type';
+
+import { createWriteStream, existsSync, mkdirSync } from 'node:fs';
+import { basename, dirname, resolve } from 'node:path';
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 
@@ -13,7 +16,7 @@ import { createOraSpinner } from './utils';
  * @param url File url
  * @returns
  */
-async function fetchFileStream(url: string) {
+const fetchFileStream = async (url: string) => {
   const res = await fetch(url);
 
   if (!res.body) {
@@ -21,7 +24,17 @@ async function fetchFileStream(url: string) {
   }
 
   return Readable.fromWeb(res.body);
-}
+};
+
+const createFileIfNotExisted = async (filepath: string) => {
+  const dir = dirname(filepath);
+
+  if (existsSync(dir)) {
+    return;
+  }
+
+  mkdirSync(dir, { recursive: true });
+};
 
 /**
  * Download remote file
@@ -29,19 +42,20 @@ async function fetchFileStream(url: string) {
  * @param url File url
  * @param retries Retry times
  */
-export const downloadFile = async (dir: string, url: string, retries?: number) => {
-  const filename = path.basename(url);
+export const downloadFile = async (filepath: string, url: string, retries?: number) => {
+  const filename = basename(url);
   const spinner = createOraSpinner(`Downloading ${filename}`);
 
   await asyncRetry(
     async (bail) => {
+      await createFileIfNotExisted(resolve(process.cwd(), filepath));
+
       try {
-        await pipeline(
-          await fetchFileStream(url),
-          fs.createWriteStream(path.join(dir, `./${filename}`)),
-        );
-      } catch (err) {
-        bail(new Error(`Failed to download ${url} Error: ${err}`));
+        await pipeline(await fetchFileStream(url), createWriteStream(filepath));
+        spinner.stop();
+      } catch (err: SAFE_ANY) {
+        spinner.stop();
+        bail(new Error(err.message));
       }
     },
     {
@@ -51,5 +65,3 @@ export const downloadFile = async (dir: string, url: string, retries?: number) =
     spinner.stop();
   });
 };
-
-downloadFile(process.cwd(), 'https://raw.githubusercontent.com/shaw996/shawkit/main/.editorconfig');

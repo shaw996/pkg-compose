@@ -3,12 +3,13 @@
 import type { SAFE_ANY } from '@/helpers/type';
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import path from 'node:path';
+import { resolve } from 'node:path';
 
 import { intro } from '@clack/prompts';
 import chalk from 'chalk';
 import { parse } from 'yaml';
 
+import { downloadFile } from '@/helpers/downloader';
 import { runCmd } from '@/helpers/utils';
 import {
   COLOR_INFO,
@@ -23,21 +24,67 @@ import {
 } from '@/prompts/shaw';
 
 const COMPOSE_YAML_NAME = 'package-compose.yaml';
-const COMPOSE_YAML_PATH = path.resolve(process.cwd(), `./${COMPOSE_YAML_NAME}`);
-const PACKAGE_JSON_PATH = path.resolve(process.cwd(), `./package.json`);
-// TODO Update template
-const COMPOSE_YAML_TEMPLATE = `{
-name: shawkit
-description: main package-compose of shawkit
-engine:
-  node: '>= 20.10.0'
-  pnpm: '>= 9.4.0'
-  npm: '>= 10.2.3'
-groups:
-  standards:
-    group_name: standards
-    description: 前端代码规范
-    url: ./standards
+const COMPOSE_YAML_PATH = resolve(process.cwd(), `./${COMPOSE_YAML_NAME}`);
+const PACKAGE_JSON_PATH = resolve(process.cwd(), `./package.json`);
+const COMPOSE_YAML_TEMPLATE = `
+# Name of yaml
+name: Git commit规范工具集合
+# Description of yaml
+description: 用于约定git commit规范的工具
+# Node Package Managers \`npm\`、\`yarn\`、\`pnpm\` 
+manager: 'pnpm'
+# Devdependencies associate to devDependencies in \`package.json\`
+dev_dependencies:
+  # Name of dependency
+  # ⚠️ Need a unique key althrough it looks meaningless at present.
+  commitizen:
+    # Name associates to npm packages
+    name: commitizen
+    # Version of the packages
+    version: 4.3.0
+    # Description of the package
+    # Use a short sentence to describe the meaning of this package
+    description: 用于规范化Git提交消息的工具
+  git-cz:
+    name: git-cz
+    version: 4.9.0
+    description: 用于帮助开发者创建符合约定式提交（Conventional Commits）规范的 Git 提交消息
+    # Associates to some configurations in \`package.json\`
+    package_json:
+      config:
+        commitizen:
+          path: ./node_modules/git-cz
+    # The download links of config files
+    configuration:
+      # The keys of configuration represent local relative paths
+      # e.g., "changelog.config.js" represents "./changelog.config.js"
+      # The values of configuration represent download links
+      changelog.config.js: https://raw.githubusercontent.com/shaw996/shawkit/main/packages/%40composes/gitcommit/changelog.config.js
+  '@commitlint/config-conventional':
+    name: '@commitlint/config-conventional'
+    version: 19.2.2
+    description: 预定义的配置包，用于 commitlint，它提供了一套基于约定式提交（Conventional Commits）规范的规则集
+  '@commitlint/cli':
+    name: '@commitlint/cli'
+    version: 19.4.0
+    description: 用于检查 Git 提交消息是否符合约定式提交（Conventional Commits）规范的命令行工具
+    package_json:
+      scripts:
+        prepare: npx husky install
+    configuration:
+      commitlint.config.js: https://raw.githubusercontent.com/shaw996/shawkit/main/packages/%40composes/gitcommit/commitlint.config.js
+  husky:
+    name: husky
+    version: 9.1.5
+    description: 用于在 Git 操作（如 commit、push 等）之前或之后运行脚本的工具
+    postinstall: npx husky install
+    package_json:
+      scripts:
+        prepare: npx husky install
+    configuration:
+      .husky/commit-msg: https://raw.githubusercontent.com/shaw996/shawkit/main/packages/%40composes/gitcommit/.husky/commit-msg
+      .husky/prepare-commit-msg: https://raw.githubusercontent.com/shaw996/shawkit/main/packages/%40composes/gitcommit/.husky/prepare-commit-msg
+
 `;
 
 /**
@@ -54,24 +101,24 @@ const createPackageCompose = () => {
  * @param depName
  */
 const mergeObject = (
-  from: Record<string, SAFE_ANY>,
-  to: Record<string, SAFE_ANY>,
+  from: ComposeDepOptions['package_json'],
+  to: ComposeDepOptions['package_json'],
   depName: string,
   propertyPath?: string,
 ) => {
-  Object.keys(from).forEach((key) => {
-    const fromValue = from[key];
-    const toValue = to[key];
+  Object.keys(from!).forEach((key) => {
+    const fromValue = from![key];
+    const toValue = to![key];
 
     if (toValue === void 0 || toValue === null) {
-      to[key] = fromValue;
+      to![key] = fromValue;
     } else {
       const _propertyPath = [propertyPath, key].filter(Boolean).join('.');
 
       if (typeof toValue === 'object' && typeof fromValue === 'object') {
         mergeObject(fromValue, toValue, depName, _propertyPath);
       } else if (toValue !== fromValue) {
-        to[`${key}[${depName} Conflicts]`] = fromValue;
+        to![`${key}[${depName} Conflicts]`] = fromValue;
         shawWarn(
           `Property "${_propertyPath}" in package_json of ${depName} conflicts with others exists, please open package.json and fix the confilcts.`,
         );
@@ -89,7 +136,7 @@ interface ComposeDepOptions {
   version: string;
   description: string;
   postinstall?: string;
-  configurations?: string[];
+  configuration?: { [key: string]: string };
   package_json?: Record<string, SAFE_ANY>;
 }
 
@@ -115,20 +162,20 @@ export const composeRunAction = async (options: ComposeRunActionOptions) => {
 
   // Introduce
   shawIntro(
-    chalk.cyanBright(`Run ${COMPOSE_YAML_NAME} '${name}'`) +
+    chalk.cyanBright(`Running ${COMPOSE_YAML_NAME} '${name}'`) +
       (description ? `\n${chalk.grey(description)}` : ''),
   );
   shawNewline();
 
   const deps = Object.values(dev_dependencies);
-  let pkgJsonWaitForMerging: [depName: string, Record<string, SAFE_ANY>][] = null!;
+  let pkgJsonWaitForMerging: [string, ComposeDepOptions['package_json']][] = null!;
   let cmdsRanFailedCount = 0;
 
   // Install dependencies in order
   for await (const dep of deps) {
     const {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
-      configurations,
+      configuration,
       description: depDesc,
       name: depName,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
@@ -171,8 +218,21 @@ export const composeRunAction = async (options: ComposeRunActionOptions) => {
       if (pkgJsonWaitForMerging === null) {
         pkgJsonWaitForMerging = [];
       }
-
       pkgJsonWaitForMerging.push([fullDepName, packageJson]);
+    }
+
+    // Download configure files
+    if (configuration) {
+      const configNames: string[] = Object.keys(configuration);
+
+      for await (const name of configNames) {
+        try {
+          await downloadFile(name, configuration[name]!);
+          shawSuccess(configuration[name]!);
+        } catch (err: SAFE_ANY) {
+          shawFailed(`Error occurs during downloading "${name}":\n${err.message}`);
+        }
+      }
     }
 
     shawNewline();
@@ -180,7 +240,7 @@ export const composeRunAction = async (options: ComposeRunActionOptions) => {
 
   // Merge package.json and update it
   if (pkgJsonWaitForMerging !== null) {
-    shawInfo(chalk.bgHex(COLOR_INFO)('Update package.json'));
+    shawInfo(chalk.bgHex(COLOR_INFO)('Updating package.json'));
     const mergedPkgJson = JSON.parse(
       readFileSync(PACKAGE_JSON_PATH, {
         encoding: 'utf-8',

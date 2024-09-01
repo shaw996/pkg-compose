@@ -1,37 +1,21 @@
-
-# Name of yaml
 name: Git commit规范工具集合
-# Description of yaml
 description: 用于约定git commit规范的工具
-# Node Package Managers `npm`、`yarn`、`pnpm` 
 manager: 'pnpm'
-# Devdependencies associate to devDependencies in `package.json`
 dev_dependencies:
-  # Name of dependency
-  # ⚠️ Need a unique key althrough it looks meaningless at present.
   commitizen:
-    # Name associates to npm packages
     name: commitizen
-    # Version of the packages
     version: 4.3.0
-    # Description of the package
-    # Use a short sentence to describe the meaning of this package
     description: 用于规范化Git提交消息的工具
   git-cz:
     name: git-cz
     version: 4.9.0
     description: 用于帮助开发者创建符合约定式提交（Conventional Commits）规范的 Git 提交消息
-    # Associates to some configurations in `package.json`
     package_json:
       config:
         commitizen:
           path: ./node_modules/git-cz
-    # The download links of config files
     configuration:
-      # The keys of configuration represent local relative paths
-      # e.g., "changelog.config.js" represents "./changelog.config.js"
-      # The values of configuration represent download links
-      changelog.config.js: https://raw.githubusercontent.com/shaw996/shawkit/main/packages/%40composes/gitcommit/changelog.config.js
+      changelog.config.js: https://raw.githubusercontent.com/shaw996/shawkit/main/packages/%40composes/changelog.config.js
   '@commitlint/config-conventional':
     name: '@commitlint/config-conventional'
     version: 19.2.2
@@ -44,7 +28,7 @@ dev_dependencies:
       scripts:
         prepare: npx husky install
     configuration:
-      commitlint.config.js: https://raw.githubusercontent.com/shaw996/shawkit/main/packages/%40composes/gitcommit/commitlint.config.js
+      commitlint.config.js: https://raw.githubusercontent.com/shaw996/shawkit/main/packages/%40composes/commitlint.config.js
   husky:
     name: husky
     version: 9.1.5
@@ -54,6 +38,5 @@ dev_dependencies:
       scripts:
         prepare: npx husky install
     configuration:
-      .husky/commit-msg: https://raw.githubusercontent.com/shaw996/shawkit/main/packages/%40composes/gitcommit/.husky/commit-msg
-      .husky/prepare-commit-msg: https://raw.githubusercontent.com/shaw996/shawkit/main/packages/%40composes/gitcommit/.husky/prepare-commit-msg
-
+      .husky/commit-msg: https://raw.githubusercontent.com/shaw996/shawkit/main/packages/%40composes/.husky/commit-msg
+      .husky/prepare-commit-msg: https://raw.githubusercontent.com/shaw996/shawkit/main/packages/%40composes/.husky/prepare-commit-msg
