@@ -5,17 +5,28 @@ import type { SAFE_ANY } from '@/helpers/type';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { log as clackLog, intro, outro } from '@clack/prompts';
+import { intro } from '@clack/prompts';
 import chalk from 'chalk';
 import { parse } from 'yaml';
 
 import { runCmd } from '@/helpers/utils';
-import { shawConfirm } from '@/prompts/shaw';
+import {
+  COLOR_INFO,
+  shawConfirm,
+  shawFailed,
+  shawInfo,
+  shawIntro,
+  shawNewline,
+  shawOutro,
+  shawSuccess,
+  shawWarn,
+} from '@/prompts/shaw';
 
-const COMPOSE_FILE_NAME = 'package-compose.yaml';
-const COMPOSE_FILE_PATH = path.resolve(process.cwd(), `./${COMPOSE_FILE_NAME}`);
+const COMPOSE_YAML_NAME = 'package-compose.yaml';
+const COMPOSE_YAML_PATH = path.resolve(process.cwd(), `./${COMPOSE_YAML_NAME}`);
+const PACKAGE_JSON_PATH = path.resolve(process.cwd(), `./package.json`);
 // TODO Update template
-const COMPOSE_FILE_TEMPLATE = `{
+const COMPOSE_YAML_TEMPLATE = `{
 name: shawkit
 description: main package-compose of shawkit
 engine:
@@ -29,8 +40,44 @@ groups:
     url: ./standards
 `;
 
+/**
+ * Create a package-compose.yaml template
+ */
 const createPackageCompose = () => {
-  writeFileSync(COMPOSE_FILE_NAME, COMPOSE_FILE_TEMPLATE, { encoding: 'utf-8' });
+  writeFileSync(COMPOSE_YAML_NAME, COMPOSE_YAML_TEMPLATE, { encoding: 'utf-8' });
+};
+
+/**
+ * Merge object
+ * @param from
+ * @param to
+ * @param depName
+ */
+const mergeObject = (
+  from: Record<string, SAFE_ANY>,
+  to: Record<string, SAFE_ANY>,
+  depName: string,
+  propertyPath?: string,
+) => {
+  Object.keys(from).forEach((key) => {
+    const fromValue = from[key];
+    const toValue = to[key];
+
+    if (toValue === void 0 || toValue === null) {
+      to[key] = fromValue;
+    } else {
+      const _propertyPath = [propertyPath, key].filter(Boolean).join('.');
+
+      if (typeof toValue === 'object' && typeof fromValue === 'object') {
+        mergeObject(fromValue, toValue, depName, _propertyPath);
+      } else if (toValue !== fromValue) {
+        to[`${key}[${depName} Conflicts]`] = fromValue;
+        shawWarn(
+          `Property "${_propertyPath}" in package_json of ${depName} conflicts with others exists, please open package.json and fix the confilcts.`,
+        );
+      }
+    }
+  });
 };
 
 export interface ComposeRunActionOptions {
@@ -43,7 +90,7 @@ interface ComposeDepOptions {
   description: string;
   postinstall?: string;
   configurations?: string[];
-  package_json?: object;
+  package_json?: Record<string, SAFE_ANY>;
 }
 
 export interface ComposeOptions {
@@ -53,31 +100,29 @@ export interface ComposeOptions {
   dev_dependencies?: {
     [name: string]: ComposeDepOptions;
   };
-  configurations?: {
-    [name: string]: string | string[];
-  };
+  remote: string[];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
 export const composeRunAction = async (options: ComposeRunActionOptions) => {
-  const yamlString = readFileSync(COMPOSE_FILE_PATH, { encoding: 'utf-8' });
+  const yamlString = readFileSync(COMPOSE_YAML_PATH, { encoding: 'utf-8' });
   const {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
     description,
     dev_dependencies = {},
     manager = 'npm',
     name,
   } = parse(yamlString) as ComposeOptions;
 
-  intro(chalk.cyanBright(`Run ${COMPOSE_FILE_NAME} '${name}'`));
-
-  if (description) {
-    clackLog.info(chalk.grey(description));
-  }
+  // Introduce
+  shawIntro(
+    chalk.cyanBright(`Run ${COMPOSE_YAML_NAME} '${name}'`) +
+      (description ? `\n${chalk.grey(description)}` : ''),
+  );
+  shawNewline();
 
   const deps = Object.values(dev_dependencies);
-  const cmdsRunFailed: (string | null)[] = [];
-  let cmdsRunFailedCount = 0;
+  let pkgJsonWaitForMerging: [depName: string, Record<string, SAFE_ANY>][] = null!;
+  let cmdsRanFailedCount = 0;
 
   // Install dependencies in order
   for await (const dep of deps) {
@@ -87,96 +132,102 @@ export const composeRunAction = async (options: ComposeRunActionOptions) => {
       description: depDesc,
       name: depName,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
-      package_json,
+      package_json: packageJson,
       postinstall,
       version,
     } = dep;
     const fullDepName = `${depName}@${version}`;
 
-    clackLog.step(`${fullDepName}: Installing`);
-
-    if (depDesc) {
-      clackLog.info(chalk.grey(depDesc));
-    }
+    shawInfo(chalk.bgHex(COLOR_INFO)(fullDepName) + (depDesc ? `\n${chalk.grey(depDesc)}` : ''));
 
     // Run installation command
     const cmd = `${manager} install -D ${fullDepName}`;
-    const cmdsRunFailedScoped: typeof cmdsRunFailed = [];
 
-    try {
-      await runCmd(cmd, {
-        fail: (errMsg) => {
-          cmdsRunFailedScoped.unshift(cmd);
-          clackLog.error(chalk.redBright(`Failed to install ${fullDepName}\n${errMsg}`));
-        },
-        success: () => {
-          clackLog.success(chalk.greenBright(`Installed ${fullDepName} successfully`));
-        },
-      });
-    } catch (err: SAFE_ANY) {
-      // I don't expect to be blocked after running command failed.
-      cmdsRunFailedScoped.unshift(cmd);
-      clackLog.error(chalk.redBright(`Failed to run ${cmd}\n${err?.message ?? 'Unknown Error'}`));
-    }
+    await runCmd(cmd, {
+      fail: (errMsg) => {
+        cmdsRanFailedCount++;
+        shawFailed(`Error occurs during run "${cmd}":\n${errMsg}`);
+      },
+      success: () => {
+        shawSuccess(cmd);
+      },
+    });
 
     // Run postinstall
     if (postinstall) {
-      clackLog.step(`Running postinstall`);
-      try {
-        await runCmd(postinstall, {
-          fail: (errMsg) => {
-            cmdsRunFailedScoped.unshift(cmd);
-            clackLog.error(chalk.redBright(`Failed to run postinstall\n${errMsg}`));
-          },
-          success: () => {
-            clackLog.success(chalk.greenBright(`Run postinstall successfully`));
-          },
-        });
-      } catch (err: SAFE_ANY) {
-        // I don't expect to be blocked after running postinstall failed.
-        cmdsRunFailedScoped.unshift(cmd);
-        clackLog.error(
-          chalk.redBright(`Failed to run postinstall\n${err?.message ?? 'Unknown Error'}`),
-        );
+      await runCmd(postinstall, {
+        fail: (errMsg) => {
+          cmdsRanFailedCount++;
+          shawFailed(`Error occurs during running "${postinstall}":\n${errMsg}`);
+        },
+        success: () => {
+          shawSuccess(postinstall!);
+        },
+      });
+    }
+
+    // Collect packageJson and then update together
+    if (packageJson) {
+      if (pkgJsonWaitForMerging === null) {
+        pkgJsonWaitForMerging = [];
       }
+
+      pkgJsonWaitForMerging.push([fullDepName, packageJson]);
     }
 
-    if (cmdsRunFailedScoped.length) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
-      cmdsRunFailedCount += cmdsRunFailedScoped.length;
-
-      // Splits the commands ran failed of each dependency
-      cmdsRunFailedScoped.unshift(null);
-      cmdsRunFailedScoped.push(fullDepName);
-      cmdsRunFailedScoped.reverse(); // Order
-
-      cmdsRunFailed.push(...cmdsRunFailedScoped);
-    }
+    shawNewline();
   }
 
-  outro(chalk.greenBright('Installed all devDependencies'));
+  // Merge package.json and update it
+  if (pkgJsonWaitForMerging !== null) {
+    shawInfo(chalk.bgHex(COLOR_INFO)('Update package.json'));
+    const mergedPkgJson = JSON.parse(
+      readFileSync(PACKAGE_JSON_PATH, {
+        encoding: 'utf-8',
+      }),
+    );
+
+    pkgJsonWaitForMerging.forEach(([depName, packageJson]) => {
+      mergeObject(packageJson, mergedPkgJson, depName);
+    });
+    writeFileSync(PACKAGE_JSON_PATH, JSON.stringify(mergedPkgJson, null, 2), {
+      encoding: 'utf-8',
+    });
+
+    shawSuccess('Complete updating package.json');
+  }
+
+  if (cmdsRanFailedCount > 0) {
+    shawOutro(
+      chalk.yellowBright(
+        `${cmdsRanFailedCount} commands failed, please check and run these commands manually`,
+      ),
+    );
+  } else {
+    shawOutro(chalk.cyanBright(`Run ${COMPOSE_YAML_NAME} '${name}' successfully`));
+  }
 };
 
 export const composeInitAction = async () => {
-  intro(chalk.cyanBright(`Create ${COMPOSE_FILE_NAME}`));
+  intro(chalk.cyanBright(`Create ${COMPOSE_YAML_NAME}`));
 
   let shouldContinue = true;
 
-  if (existsSync(COMPOSE_FILE_PATH)) {
+  if (existsSync(COMPOSE_YAML_PATH)) {
     shouldContinue = !!(await shawConfirm({
       initialValue: false,
-      message: `${COMPOSE_FILE_NAME} already exists. Do you want to cover it?`,
+      message: `${COMPOSE_YAML_NAME} already exists. Do you want to cover it?`,
     }));
 
     if (shouldContinue) {
       createPackageCompose();
-      outro(`Open ${chalk.cyanBright(COMPOSE_FILE_NAME)} and add configurations you prefered`);
+      shawOutro(`Open ${chalk.cyanBright(COMPOSE_YAML_NAME)} and add configurations you prefered`);
     } else {
-      outro(`Click to check ${chalk.cyanBright(COMPOSE_FILE_NAME)} existed`);
+      shawOutro(`Click to check ${chalk.cyanBright(COMPOSE_YAML_NAME)} existed`);
     }
   } else {
     createPackageCompose();
-    outro(`Open ${chalk.cyanBright(COMPOSE_FILE_NAME)} and add configurations you prefered`);
+    shawOutro(`Open ${chalk.cyanBright(COMPOSE_YAML_NAME)} and add configurations you prefered`);
   }
 
   process.exit(0);

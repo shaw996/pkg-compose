@@ -27,6 +27,9 @@ dev_dependencies:
     name: '@commitlint/cli'
     version: 19.4.0
     description: 用于检查 Git 提交消息是否符合约定式提交（Conventional Commits）规范的命令行工具
+    package_json:
+      scripts:
+        prepare: npx husky install
     configurations:
       - standards/commitlint.config.js
   husky:
