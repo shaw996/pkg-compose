@@ -1,3 +1,3 @@
 # Git Commit Configuration
 
-`package-compose.yaml` for **Git Commit**.
+`pkg-compose.yaml` for **Git Commit**.

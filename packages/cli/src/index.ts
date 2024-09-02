@@ -28,16 +28,16 @@ const composeCommand = shawkit
 // compose init
 composeCommand
   .command('init')
-  .description('Create a template of package-compose.yaml')
+  .description('Create a template of pkg-compose.yaml')
   .action(composeInitAction);
 
 // compose run
 composeCommand
   .command('run')
-  .description('Looking for .packagecomposerc and handling package-compose.yaml declared in it')
+  .description('Looking for .packagecomposerc and handling pkg-compose.yaml declared in it')
   .option(
     '-c --config [string]',
-    'Specify a configuration file, e.g., ./package-compose.yaml or https://[REMOTE]/package-compose.yaml',
+    'Specify a configuration file, e.g., ./pkg-compose.yaml or https://[REMOTE]/pkg-compose.yaml',
   )
   .action(composeRunAction);
 

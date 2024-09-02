@@ -23,7 +23,7 @@ import {
   shawWarn,
 } from '@/prompts/shaw';
 
-const COMPOSE_YAML_NAME = 'package-compose.yaml';
+const COMPOSE_YAML_NAME = 'pkg-compose.yaml';
 const COMPOSE_YAML_PATH = resolve(process.cwd(), `./${COMPOSE_YAML_NAME}`);
 const PACKAGE_JSON_PATH = resolve(process.cwd(), `./package.json`);
 const COMPOSE_YAML_TEMPLATE = `
@@ -88,7 +88,7 @@ dev_dependencies:
 `;
 
 /**
- * Create a package-compose.yaml template
+ * Create a pkg-compose.yaml template
  */
 const createPackageCompose = () => {
   writeFileSync(COMPOSE_YAML_NAME, COMPOSE_YAML_TEMPLATE, { encoding: 'utf-8' });
