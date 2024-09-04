@@ -2,49 +2,50 @@ import { Command } from 'commander';
 
 import pkg from '../package.json';
 
-import { composeInitAction, composeRunAction } from './actions/compose-action';
-import { error, log, newLine } from './helpers/logger';
-import { createDefaultAction, printLogAndReturnDesc } from './helpers/utils';
+import { generateAction, runAction } from './actions';
+import { shawFail, shawGradient, shawLine } from './prompts';
+import { createDefaultAction } from './utils';
 
-const shawcli = new Command();
+const pkgCompose = new Command();
 
-shawcli
-  .name('shawcli')
+pkgCompose
+  .name('pkgc')
   .usage('[command]')
-  .description(printLogAndReturnDesc(`\nShaw Kit CLI v${pkg.version}\n`, 'CLI helper for personal'))
+  .description(
+    (() => {
+      shawGradient(`pkg-compose v${pkg.version}\n`);
+
+      return '';
+    })(),
+  )
   .version(pkg.version, '-v, --version', 'Output the current version')
   .helpOption('-h, --help', 'Display help for command')
   .allowUnknownOption()
-  .action(createDefaultAction(['compose'], 'shawcli --help'));
+  .action(createDefaultAction(['generate', 'run'], 'pkgc --help'));
 
-const composeCommand = shawcli
-  .command('compose')
-  .description('Installing npm dependencies and generating configurations from remote')
+// pkgc r [-c --config]
+// pkgc run [-c --config]
+pkgCompose
+  .command('run')
+  .alias('r')
+  .description("Read pkgconfig.json, then request and recognize pkg-compose.yaml's content")
   .usage('[command]')
   .helpOption('-h, --help', 'Display help for command')
-  .allowUnknownOption()
-  .action(createDefaultAction(['init', 'run'], 'shawcli compose --help'));
+  .option('-c --config [string]', "Use particular pkg-compose.yaml's url")
+  .allowUnknownOption(false)
+  .action(runAction);
 
-// compose init
-composeCommand
-  .command('init')
-  .description('Create a template of pkg-compose.yaml')
-  .action(composeInitAction);
+// pkg g
+// pkg generate
+pkgCompose
+  .command('generate')
+  .alias('g')
+  .description('Generate a pkg-compose.yaml for sample')
+  .action(generateAction);
 
-// compose run
-composeCommand
-  .command('run')
-  .description('Looking for .packagecomposerc and handling pkg-compose.yaml declared in it')
-  .option(
-    '-c --config [string]',
-    'Specify a configuration file, e.g., ./pkg-compose.yaml or https://[REMOTE]/pkg-compose.yaml',
-  )
-  .action(composeRunAction);
-
-shawcli.parseAsync(process.argv).catch(async (reason) => {
-  newLine();
-  error('Unexpected error. Please report it as a bug:');
-  log(reason);
-  newLine();
+pkgCompose.parseAsync(process.argv).catch(async (reason) => {
+  shawLine();
+  shawFail(reason);
+  shawLine();
   process.exit(1);
 });

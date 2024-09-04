@@ -1,4 +1,6 @@
 {
-  "gitCommit": "https://raw.githubusercontent.com/shaw996/shaw/main/packages/%40composes/gitCommits/pkg-compose.yaml",
-  "codeStyle": "https://raw.githubusercontent.com/shaw996/shaw/main/packages/%40composes/gitCommits/pkg-compose.yaml"
+  "manager": "npm",
+  "pkgComposes": [
+    "https://raw.githubusercontent.com/shaw996/pkg-compose/main/packages/%40composes/gitcommit/pkg-compose.yaml"
+  ]
 }

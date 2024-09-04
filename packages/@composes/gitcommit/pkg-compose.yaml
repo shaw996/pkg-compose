@@ -1,6 +1,5 @@
 name: Git commit规范工具集合
 description: 用于约定git commit规范的工具
-manager: 'pnpm'
 dev_dependencies:
   commitizen:
     name: commitizen
@@ -15,7 +14,7 @@ dev_dependencies:
         commitizen:
           path: ./node_modules/git-cz
     configuration:
-      changelog.config.js: https://raw.githubusercontent.com/shaw996/shaw/main/packages/%40composes/gitCommits/changelog.config.js
+      changelog.config.js: https://raw.githubusercontent.com/shaw996/pkg-compose/main/packages/%40composes/gitcommit/changelog.config.js
   '@commitlint/config-conventional':
     name: '@commitlint/config-conventional'
     version: 19.2.2
@@ -28,7 +27,7 @@ dev_dependencies:
       scripts:
         prepare: npx husky install
     configuration:
-      commitlint.config.js: https://raw.githubusercontent.com/shaw996/shaw/main/packages/%40composes/gitCommits/commitlint.config.js
+      commitlint.config.js: https://raw.githubusercontent.com/shaw996/pkg-compose/main/packages/%40composes/gitcommit/commitlint.config.js
   husky:
     name: husky
     version: 9.1.5
@@ -38,5 +37,5 @@ dev_dependencies:
       scripts:
         prepare: npx husky install
     configuration:
-      .husky/commit-msg: https://raw.githubusercontent.com/shaw996/shaw/main/packages/%40composes/gitCommits/.husky/commit-msg
-      .husky/prepare-commit-msg: https://raw.githubusercontent.com/shaw996/shaw/main/packages/%40composes/gitCommits/.husky/prepare-commit-msg
+      .husky/commit-msg: https://raw.githubusercontent.com/shaw996/pkg-compose/main/packages/%40composes/gitcommit/.husky/commit-msg
+      .husky/prepare-commit-msg: https://raw.githubusercontent.com/shaw996/pkg-compose/main/packages/%40composes/gitcommit/.husky/prepare-commit-msg

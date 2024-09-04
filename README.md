@@ -1,3 +1,3 @@
-# Shaw
+# pkg-compose
 
-A collection of personal development tools
+A cli fastly integrating groups of npm dependencies
