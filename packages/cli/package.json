@@ -1,6 +1,5 @@
 {
-  "name": "@shaw/cli",
-  "private": false,
+  "name": "shawcli",
   "type": "module",
   "license": "MIT",
   "version": "0.0.1",
