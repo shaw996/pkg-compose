@@ -38,21 +38,21 @@ export const shawConfirm = async (opts: ConfirmOptions): ReturnType<typeof confi
  * @param message
  */
 export const shawIntro = (message: string): void => {
-  console.log(shawGradient(message));
+  console.log('\n' + shawGradient(message));
 };
 
 /**
  * Mesage
  */
 export const shawMessage = (message: string): void => {
-  console.log(message);
+  console.log('\n' + message);
 };
 
 /**
  * Information
  */
 export const shawInfo = (message: string): void => {
-  console.log(chalk.hex(INFO_COLOR)('● [INFO]') + message);
+  console.log('\n' + chalk.hex(INFO_COLOR)('[● INFO]: ') + message);
 };
 
 /**
@@ -60,7 +60,7 @@ export const shawInfo = (message: string): void => {
  * @param message
  */
 export const shawDone = (message: string): void => {
-  console.log(chalk.cyan('[✔️ DONE]') + message);
+  console.log('\n' + chalk.cyan('[✔️ DONE]: ') + message);
 };
 
 /**
@@ -68,7 +68,7 @@ export const shawDone = (message: string): void => {
  * @param message
  */
 export const shawWarn = (message: string): void => {
-  console.log(chalk.yellowBright('[▲ WARN]: ') + message);
+  console.log('\n' + chalk.yellowBright('[▲ WARNING]: ') + message);
 };
 
 /**
@@ -76,7 +76,7 @@ export const shawWarn = (message: string): void => {
  * @param message
  */
 export const shawFail = (message: string): void => {
-  console.log(chalk.redBright('[✖️ FAIL]: ') + message);
+  console.log('\n' + chalk.redBright('[✖️ FAILED]: ') + message);
 };
 
 /**

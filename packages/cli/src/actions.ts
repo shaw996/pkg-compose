@@ -177,18 +177,16 @@ const recognizePkgCompose = async (manager: PkgConfig['manager'], pkgCompose: st
   // Install dependencies in order
   for await (const dep of deps) {
     const {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
       configuration,
       description: depDesc,
       name: depName,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
       package_json: packageJson,
       postinstall,
       version,
     } = dep;
     const fullDepName = `${depName}@${version}`;
 
-    shawInfo(chalk.bgHex(INFO_COLOR)(fullDepName) + (depDesc ? `\n${chalk.grey(depDesc)}` : ''));
+    shawInfo(fullDepName + (depDesc ? `\n${chalk.grey(depDesc)}` : ''));
 
     // Run installation command
     const cmd = `${manager} install -D ${fullDepName}`;
@@ -196,7 +194,7 @@ const recognizePkgCompose = async (manager: PkgConfig['manager'], pkgCompose: st
     await runCmd(cmd, {
       fail: (errMsg) => {
         cmdsRanFailedCount++;
-        shawFail(`Error occurs during run "${cmd}":\n${errMsg}`);
+        shawFail(`Error occurs during run "${cmd}".\n${errMsg}`);
       },
       success: () => {
         shawDone(cmd);

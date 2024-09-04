@@ -21,7 +21,7 @@ pkgCompose
   .version(pkg.version, '-v, --version', 'Output the current version')
   .helpOption('-h, --help', 'Display help for command')
   .allowUnknownOption()
-  .action(createDefaultAction(['generate', 'run'], 'pkgc --help'));
+  .action(createDefaultAction(['generate', 'run'], 'pkgc'));
 
 // pkgc r [-c --config]
 // pkgc run [-c --config]
