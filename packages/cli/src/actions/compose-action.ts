@@ -9,7 +9,7 @@ import { intro } from '@clack/prompts';
 import chalk from 'chalk';
 import { parse } from 'yaml';
 
-import { downloadFile } from '@/helpers/downloader';
+import { downloadFile, fetchFile } from '@/helpers/downloader';
 import { runCmd } from '@/helpers/utils';
 import {
   COLOR_INFO,
@@ -25,6 +25,7 @@ import {
 
 const COMPOSE_YAML_NAME = 'pkg-compose.yaml';
 const COMPOSE_YAML_PATH = resolve(process.cwd(), `./${COMPOSE_YAML_NAME}`);
+const PKGCONFIG_JSON_PATH = resolve(process.cwd(), `./pkgconfig.json`);
 const PACKAGE_JSON_PATH = resolve(process.cwd(), `./package.json`);
 const COMPOSE_YAML_TEMPLATE = `
 # Name of yaml
@@ -127,38 +128,17 @@ const mergeObject = (
   });
 };
 
-export interface ComposeRunActionOptions {
-  config?: string;
-}
-
-interface ComposeDepOptions {
-  name: string;
-  version: string;
-  description: string;
-  postinstall?: string;
-  configuration?: { [key: string]: string };
-  package_json?: Record<string, SAFE_ANY>;
-}
-
-export interface ComposeOptions {
-  name: string;
-  description: string;
-  manager: 'npm' | 'yarn' | 'pnpm';
-  dev_dependencies?: {
-    [name: string]: ComposeDepOptions;
-  };
-  remote: string[];
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
-export const composeRunAction = async (options: ComposeRunActionOptions) => {
-  const yamlString = readFileSync(COMPOSE_YAML_PATH, { encoding: 'utf-8' });
+/**
+ * 解析pkg-compose.yaml
+ * @param yamlText
+ */
+const recognizePkgCompose = async (pkgCompose: string) => {
   const {
     description,
     dev_dependencies = {},
     manager = 'npm',
     name,
-  } = parse(yamlString) as ComposeOptions;
+  } = parse(pkgCompose) as ComposeOptions;
 
   // Introduce
   shawIntro(
@@ -266,6 +246,47 @@ export const composeRunAction = async (options: ComposeRunActionOptions) => {
   } else {
     shawOutro(chalk.cyanBright(`Run ${COMPOSE_YAML_NAME} '${name}' successfully`));
   }
+};
+
+export interface ComposeRunActionOptions {
+  config?: string;
+}
+
+interface ComposeDepOptions {
+  name: string;
+  version: string;
+  description: string;
+  postinstall?: string;
+  configuration?: { [key: string]: string };
+  package_json?: Record<string, SAFE_ANY>;
+}
+
+export interface ComposeOptions {
+  name: string;
+  description: string;
+  manager: 'npm' | 'yarn' | 'pnpm';
+  dev_dependencies?: {
+    [name: string]: ComposeDepOptions;
+  };
+  remote: string[];
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
+export const composeRunAction = async (options: ComposeRunActionOptions) => {
+  const pkgconfigJson: { [key: string]: string } = JSON.parse(
+    readFileSync(PKGCONFIG_JSON_PATH, { encoding: 'utf-8' }),
+  );
+
+  const pkgcomposes = Object.values(pkgconfigJson);
+
+  for await (const compose of pkgcomposes) {
+    const resp = await fetchFile(compose);
+    const pkgCompose = await resp.text();
+
+    await recognizePkgCompose(pkgCompose);
+  }
+
+  return;
 };
 
 export const composeInitAction = async () => {

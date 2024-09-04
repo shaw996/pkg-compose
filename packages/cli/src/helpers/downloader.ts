@@ -16,14 +16,25 @@ import { createOraSpinner } from './utils';
  * @param url File url
  * @returns
  */
-const fetchFileStream = async (url: string) => {
+export const fetchFile = async (url: string): Promise<Response> => {
   const res = await fetch(url);
 
   if (!res.body) {
-    throw new Error(`Failed to download: ${url}`);
+    throw new Error(`Failed to fetch: ${url}`);
   }
 
-  return Readable.fromWeb(res.body);
+  return res;
+};
+
+/**
+ * Fetch file stream
+ * @param url File url
+ * @returns
+ */
+const fetchFileStream = async (url: string) => {
+  const res = await fetchFile(url);
+
+  return Readable.fromWeb(res.body!);
 };
 
 const createFileIfNotExisted = async (filepath: string) => {

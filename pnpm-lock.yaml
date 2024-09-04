@@ -123,6 +123,22 @@ importers:
       '@shawkit/cli':
         specifier: workspace:*
         version: link:../cli
+    devDependencies:
+      '@commitlint/cli':
+        specifier: 19.4.0
+        version: 19.4.0(@types/node@22.5.0)(typescript@5.5.4)
+      '@commitlint/config-conventional':
+        specifier: 19.2.2
+        version: 19.2.2
+      commitizen:
+        specifier: 4.3.0
+        version: 4.3.0(@types/node@22.5.0)(typescript@5.5.4)
+      git-cz:
+        specifier: 4.9.0
+        version: 4.9.0
+      husky:
+        specifier: 9.1.5
+        version: 9.1.5
 
 packages:
 
