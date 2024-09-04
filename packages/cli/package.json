@@ -1,10 +1,10 @@
 {
-  "name": "@shawkit/cli",
+  "name": "@shaw/cli",
   "private": false,
   "type": "module",
   "license": "MIT",
   "version": "0.0.1",
-  "homepage": "https://github.com/shaw996/shawkit#readme",
+  "homepage": "https://github.com/shaw996/shaw#readme",
   "description": "A CLI contains some development kits of Shaw996",
   "keywords": [
     "CLI",
@@ -18,10 +18,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/shaw996/shawkit.git"
+    "url": "https://github.com/shaw996/shaw.git"
   },
   "bugs": {
-    "url": "https://github.com/shaw996/shawkit/issues"
+    "url": "https://github.com/shaw996/shaw/issues"
   },
   "publishConfig": {
     "access": "public",
@@ -31,16 +31,13 @@
     "dist"
   ],
   "bin": {
-    "shawkit": "./dist/index.js"
+    "shawcli": "./dist/index.js"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "scripts": {
     "dev": "tsup --watch",
-    "build": "tsup",
-    "shawkit": "npx shawkit",
-    "compose": "npx shawkit compose",
-    "composeinit": "npx shawkit compose init"
+    "build": "tsup"
   },
   "dependencies": {
     "@clack/prompts": "0.7.0",

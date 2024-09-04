@@ -1,2 +1,3 @@
-# shawkit
-A  collection of personal development tools
+# Shaw
+
+A collection of personal development tools

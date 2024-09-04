@@ -120,7 +120,7 @@ importers:
 
   packages/cli-test:
     dependencies:
-      '@shawkit/cli':
+      '@shaw/cli':
         specifier: workspace:*
         version: link:../cli
     devDependencies:

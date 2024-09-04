@@ -10,7 +10,7 @@ import chalk from 'chalk';
 import { parse } from 'yaml';
 
 import { downloadFile, fetchFile } from '@/helpers/downloader';
-import { error } from '@/helpers/logger';
+import { error, newLine } from '@/helpers/logger';
 import { runCmd } from '@/helpers/utils';
 import {
   COLOR_INFO,
@@ -61,7 +61,7 @@ dev_dependencies:
       # The keys of configuration represent local relative paths
       # e.g., "changelog.config.js" represents "./changelog.config.js"
       # The values of configuration represent download links
-      changelog.config.js: https://raw.githubusercontent.com/shaw996/shawkit/main/packages/%40composes/gitcommit/changelog.config.js
+      changelog.config.js: https://raw.githubusercontent.com/shaw996/shaw/main/packages/%40composes/gitcommit/changelog.config.js
   '@commitlint/config-conventional':
     name: '@commitlint/config-conventional'
     version: 19.2.2
@@ -74,7 +74,7 @@ dev_dependencies:
       scripts:
         prepare: npx husky install
     configuration:
-      commitlint.config.js: https://raw.githubusercontent.com/shaw996/shawkit/main/packages/%40composes/gitcommit/commitlint.config.js
+      commitlint.config.js: https://raw.githubusercontent.com/shaw996/shaw/main/packages/%40composes/gitcommit/commitlint.config.js
   husky:
     name: husky
     version: 9.1.5
@@ -84,8 +84,8 @@ dev_dependencies:
       scripts:
         prepare: npx husky install
     configuration:
-      .husky/commit-msg: https://raw.githubusercontent.com/shaw996/shawkit/main/packages/%40composes/gitcommit/.husky/commit-msg
-      .husky/prepare-commit-msg: https://raw.githubusercontent.com/shaw996/shawkit/main/packages/%40composes/gitcommit/.husky/prepare-commit-msg
+      .husky/commit-msg: https://raw.githubusercontent.com/shaw996/shaw/main/packages/%40composes/gitcommit/.husky/commit-msg
+      .husky/prepare-commit-msg: https://raw.githubusercontent.com/shaw996/shaw/main/packages/%40composes/gitcommit/.husky/prepare-commit-msg
 
 `;
 
@@ -143,8 +143,7 @@ const recognizePkgCompose = async (pkgCompose: string) => {
 
   // Introduce
   shawIntro(
-    chalk.cyanBright(`Running ${COMPOSE_YAML_NAME} '${name}'`) +
-      (description ? `\n${chalk.grey(description)}` : ''),
+    chalk.cyanBright(`Recognizing "${name}"`) + (description ? `\n${chalk.grey(description)}` : ''),
   );
   shawNewline();
 
@@ -245,8 +244,10 @@ const recognizePkgCompose = async (pkgCompose: string) => {
       ),
     );
   } else {
-    shawOutro(chalk.cyanBright(`Run ${COMPOSE_YAML_NAME} '${name}' successfully`));
+    shawOutro(chalk.cyanBright(`Recognized "${name}" successfully`));
   }
+
+  newLine(2);
 };
 
 export interface ComposeRunActionOptions {

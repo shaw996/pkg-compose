@@ -15,7 +15,7 @@ dev_dependencies:
         commitizen:
           path: ./node_modules/git-cz
     configuration:
-      changelog.config.js: https://raw.githubusercontent.com/shaw996/shawkit/main/packages/%40composes/changelog.config.js
+      changelog.config.js: https://raw.githubusercontent.com/shaw996/shaw/main/packages/%40composes/changelog.config.js
   '@commitlint/config-conventional':
     name: '@commitlint/config-conventional'
     version: 19.2.2
@@ -28,7 +28,7 @@ dev_dependencies:
       scripts:
         prepare: npx husky install
     configuration:
-      commitlint.config.js: https://raw.githubusercontent.com/shaw996/shawkit/main/packages/%40composes/commitlint.config.js
+      commitlint.config.js: https://raw.githubusercontent.com/shaw996/shaw/main/packages/%40composes/commitlint.config.js
   husky:
     name: husky
     version: 9.1.5
@@ -38,5 +38,5 @@ dev_dependencies:
       scripts:
         prepare: npx husky install
     configuration:
-      .husky/commit-msg: https://raw.githubusercontent.com/shaw996/shawkit/main/packages/%40composes/.husky/commit-msg
-      .husky/prepare-commit-msg: https://raw.githubusercontent.com/shaw996/shawkit/main/packages/%40composes/.husky/prepare-commit-msg
+      .husky/commit-msg: https://raw.githubusercontent.com/shaw996/shaw/main/packages/%40composes/.husky/commit-msg
+      .husky/prepare-commit-msg: https://raw.githubusercontent.com/shaw996/shaw/main/packages/%40composes/.husky/prepare-commit-msg

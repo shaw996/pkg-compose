@@ -6,24 +6,24 @@ import { composeInitAction, composeRunAction } from './actions/compose-action';
 import { error, log, newLine } from './helpers/logger';
 import { createDefaultAction, printLogAndReturnDesc } from './helpers/utils';
 
-const shawkit = new Command();
+const shawcli = new Command();
 
-shawkit
-  .name('shawkit')
+shawcli
+  .name('shawcli')
   .usage('[command]')
   .description(printLogAndReturnDesc(`\nShaw Kit CLI v${pkg.version}\n`, 'CLI helper for personal'))
   .version(pkg.version, '-v, --version', 'Output the current version')
   .helpOption('-h, --help', 'Display help for command')
   .allowUnknownOption()
-  .action(createDefaultAction(['compose'], 'shawkit --help'));
+  .action(createDefaultAction(['compose'], 'shawcli --help'));
 
-const composeCommand = shawkit
+const composeCommand = shawcli
   .command('compose')
   .description('Installing npm dependencies and generating configurations from remote')
   .usage('[command]')
   .helpOption('-h, --help', 'Display help for command')
   .allowUnknownOption()
-  .action(createDefaultAction(['init', 'run'], 'shawkit compose --help'));
+  .action(createDefaultAction(['init', 'run'], 'shawcli compose --help'));
 
 // compose init
 composeCommand
@@ -41,7 +41,7 @@ composeCommand
   )
   .action(composeRunAction);
 
-shawkit.parseAsync(process.argv).catch(async (reason) => {
+shawcli.parseAsync(process.argv).catch(async (reason) => {
   newLine();
   error('Unexpected error. Please report it as a bug:');
   log(reason);

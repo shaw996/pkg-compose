@@ -1,10 +1,10 @@
 {
-  "name": "shawkit",
+  "name": "shaw",
   "private": false,
   "type": "module",
   "license": "MIT",
   "version": "0.0.1",
-  "homepage": "https://github.com/shaw996/shawkit#readme",
+  "homepage": "https://github.com/shaw996/shaw#readme",
   "description": "A monorepo project of Shaw996, with some tools in",
   "keywords": [
     "CLI",
@@ -16,10 +16,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/shaw996/shawkit.git"
+    "url": "https://github.com/shaw996/shaw.git"
   },
   "bugs": {
-    "url": "https://github.com/shaw996/shawkit/issues"
+    "url": "https://github.com/shaw996/shaw/issues"
   },
   "publishConfig": {
     "access": "public",
