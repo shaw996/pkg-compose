@@ -4,25 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "npx husky install"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@shaw/cli": "workspace:*"
-  },
-  "devDependencies": {
-    "@commitlint/cli": "19.4.0",
-    "@commitlint/config-conventional": "19.2.2",
-    "commitizen": "4.3.0",
-    "git-cz": "4.9.0",
-    "husky": "9.1.5"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/git-cz"
-    }
+    "shawcli": "workspace:*"
   }
 }

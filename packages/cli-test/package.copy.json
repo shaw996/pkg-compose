@@ -10,6 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@shaw/cli": "workspace:*"
+    "shawcli": "workspace:*"
   }
 }
