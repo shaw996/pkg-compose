@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@shawkit/cli": "workspace:*"
+    "@shaw/cli": "workspace:*"
   },
   "devDependencies": {
     "@commitlint/cli": "19.4.0",
