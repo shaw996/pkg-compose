@@ -10,6 +10,7 @@ import chalk from 'chalk';
 import { parse } from 'yaml';
 
 import { downloadFile, fetchFile } from '@/helpers/downloader';
+import { error } from '@/helpers/logger';
 import { runCmd } from '@/helpers/utils';
 import {
   COLOR_INFO,
@@ -277,10 +278,16 @@ export const composeRunAction = async (options: ComposeRunActionOptions) => {
     readFileSync(PKGCONFIG_JSON_PATH, { encoding: 'utf-8' }),
   );
 
-  const pkgcomposes = Object.values(pkgconfigJson);
+  const pkgcomposeUrls = Object.values(pkgconfigJson);
 
-  for await (const compose of pkgcomposes) {
-    const resp = await fetchFile(compose);
+  for await (const url of pkgcomposeUrls) {
+    const resp = await fetchFile(url);
+
+    if (resp.status === 404) {
+      error(`404 Not Found: ${url}`);
+      continue;
+    }
+
     const pkgCompose = await resp.text();
 
     await recognizePkgCompose(pkgCompose);
