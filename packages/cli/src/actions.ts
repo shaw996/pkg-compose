@@ -7,14 +7,14 @@ import { intro } from '@clack/prompts';
 import chalk from 'chalk';
 import { parse } from 'yaml';
 
-import { INFO_COLOR } from './constants';
 import {
   shawConfirm,
   shawDone,
   shawFail,
   shawInfo,
-  shawIntro,
+  shawIntroduce,
   shawLine,
+  shawMessage,
   shawWarn,
 } from './prompts';
 import { downloadFile, fetchFile, runCmd } from './utils';
@@ -160,15 +160,12 @@ const mergeObject = (
  * @param yamlText
  */
 const recognizePkgCompose = async (manager: PkgConfig['manager'], pkgCompose: string) => {
-  manager = manager ?? 'npm';
-
   const { description, dev_dependencies = {}, name } = parse(pkgCompose) as ComposeOptions;
 
-  // Introduce
-  shawIntro(
-    chalk.cyanBright(`Recognizing "${name}"`) + (description ? `\n${chalk.grey(description)}` : ''),
-  );
-  shawLine();
+  // pkgcompose's info
+  const desc = description ? chalk.grey(' ' + description) : '';
+
+  shawInfo(name + desc);
 
   const deps = Object.values(dev_dependencies);
   let pkgJsonWaitForMerging: [string, ComposeDepOptions['package_json']][] = null!;
@@ -186,7 +183,7 @@ const recognizePkgCompose = async (manager: PkgConfig['manager'], pkgCompose: st
     } = dep;
     const fullDepName = `${depName}@${version}`;
 
-    shawInfo(fullDepName + (depDesc ? `\n${chalk.grey(depDesc)}` : ''));
+    shawInfo(fullDepName + (depDesc ? ` ${chalk.grey(depDesc)}` : ''));
 
     // Run installation command
     const cmd = `${manager} install -D ${fullDepName}`;
@@ -235,13 +232,11 @@ const recognizePkgCompose = async (manager: PkgConfig['manager'], pkgCompose: st
         }
       }
     }
-
-    shawLine();
   }
 
   // Merge package.json and update it
   if (pkgJsonWaitForMerging !== null) {
-    shawInfo(chalk.bgHex(INFO_COLOR)('Updating package.json'));
+    shawInfo('Modifiy package.json');
     const mergedPkgJson = JSON.parse(
       readFileSync(PACKAGE_JSON_PATH, {
         encoding: 'utf-8',
@@ -255,27 +250,31 @@ const recognizePkgCompose = async (manager: PkgConfig['manager'], pkgCompose: st
       encoding: 'utf-8',
     });
 
-    shawDone('Complete updating package.json');
+    shawDone('Complete modifying package.json');
   }
 
   if (cmdsRanFailedCount > 0) {
     shawFail(`${cmdsRanFailedCount} commands failed, please check and run these commands manually`);
   }
 
-  shawLine(2);
+  shawLine();
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
 export const runAction = async (options: ComposeRunActionOptions) => {
   const pkgconfig: PkgConfig = JSON.parse(readFileSync(PKGCONFIG_JSON_PATH, { encoding: 'utf-8' }));
 
-  const { manager, pkgComposes } = pkgconfig;
-
-  if (!pkgComposes || !pkgComposes.length) {
+  if (!pkgconfig.pkgComposes || !pkgconfig.pkgComposes.length) {
     return;
   }
 
-  for await (const url of pkgComposes) {
+  shawIntroduce();
+
+  pkgconfig.manager = pkgconfig.manager ?? 'npm';
+  shawMessage(`Use manager: ` + chalk.bgCyanBright(pkgconfig.manager));
+  shawLine();
+
+  for await (const url of pkgconfig.pkgComposes) {
     const resp = await fetchFile(url);
 
     if (resp.status === 404) {
@@ -285,7 +284,8 @@ export const runAction = async (options: ComposeRunActionOptions) => {
 
     const pkgComposeText = await resp.text();
 
-    await recognizePkgCompose(manager, pkgComposeText);
+    await recognizePkgCompose(pkgconfig.manager, pkgComposeText);
+    shawLine();
   }
 };
 

@@ -3,14 +3,24 @@ import type { SAFE_ANY } from './typedefs';
 import { exec } from 'node:child_process';
 import { createWriteStream, existsSync, mkdirSync } from 'node:fs';
 import { basename, dirname, resolve } from 'node:path';
-import { Readable, pipeline } from 'node:stream';
+import { Readable } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
 
 import asyncRetry from 'async-retry';
 import chalk from 'chalk';
 import fetch from 'node-fetch-native';
 import ora, { type Ora } from 'ora';
 
-import { shawFail, shawMessage } from './prompts';
+import { shawFail, shawIntro, shawLine, shawMessage } from './prompts';
+
+export const introduce = () => {
+  shawIntro('Thank you for using pkg compose.');
+  shawMessage(
+    'If you have any issues, please create an issue on ' +
+      chalk.underline('https://github.com/shaw996/pkg-compose/issues'),
+  );
+  shawLine();
+};
 
 /**
  * Create ora spinner
@@ -128,27 +138,8 @@ export const createDefaultAction = (commandList: string[], helpCommand: string) 
     }
 
     if (!isArgs) {
-      // If no arguments then run "[command] --help" to display help list
       const helpInfo = await runCmd(`${helpCommand} --help`);
 
-      // const helpInfoArr = helpInfo
-      //   .split('\n')
-      //   .map((info) => {
-      //     if (!info || info.includes('Shaw Kit CLI v') || info.startsWith('>')) {
-      //       return null;
-      //     }
-
-      //     const command = info.match(/(\w+)\s\[/)?.[1];
-
-      //     if (command) {
-      //       return info.replace(command, chalk.cyan(command));
-      //     }
-
-      //     return info;
-      //   })
-      //   .filter(Boolean);
-
-      // shawMessage(helpInfoArr.join('\n'));
       shawMessage(helpInfo);
     }
 

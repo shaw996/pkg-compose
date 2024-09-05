@@ -1,5 +1,5 @@
 {
-  "manager": "npm",
+  "manager": "pnpm",
   "pkgComposes": [
     "https://raw.githubusercontent.com/shaw996/pkg-compose/main/packages/%40composes/gitcommit/pkg-compose.yaml"
   ]

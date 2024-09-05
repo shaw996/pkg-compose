@@ -7,7 +7,16 @@ import { default as gradientString } from 'gradient-string';
 
 import { DEFAULT_COLORS, INFO_COLOR } from './constants';
 
-export const shawGradient = gradientString(...DEFAULT_COLORS);
+export const gradient = gradientString(...DEFAULT_COLORS);
+
+export const shawIntroduce = () => {
+  shawGradient('Thank you for using pkg-compose.');
+  shawGradient(
+    'If you have any issues, please create an issue on ' +
+      chalk.underline('https://github.com/shaw996/pkg-compose/issues.'),
+  );
+  shawLine();
+};
 
 /**
  * Print "Operation cancelled" and exit
@@ -34,25 +43,25 @@ export const shawConfirm = async (opts: ConfirmOptions): ReturnType<typeof confi
 };
 
 /**
- * Introduction
+ * Print gradient string
  * @param message
  */
-export const shawIntro = (message: string): void => {
-  console.log('\n' + shawGradient(message));
+export const shawGradient = (message: string): void => {
+  console.log(gradient(message));
 };
 
 /**
  * Mesage
  */
 export const shawMessage = (message: string): void => {
-  console.log('\n' + message);
+  console.log(message);
 };
 
 /**
  * Information
  */
 export const shawInfo = (message: string): void => {
-  console.log('\n' + chalk.hex(INFO_COLOR)('[● INFO]: ') + message);
+  console.log(chalk.hex(INFO_COLOR)('● INFO: ') + message);
 };
 
 /**
@@ -60,7 +69,7 @@ export const shawInfo = (message: string): void => {
  * @param message
  */
 export const shawDone = (message: string): void => {
-  console.log('\n' + chalk.cyan('[✔️ DONE]: ') + message);
+  console.log(chalk.greenBright('✔️ DONE: ') + message);
 };
 
 /**
@@ -68,7 +77,7 @@ export const shawDone = (message: string): void => {
  * @param message
  */
 export const shawWarn = (message: string): void => {
-  console.log('\n' + chalk.yellowBright('[▲ WARNING]: ') + message);
+  console.log(chalk.yellowBright('▲ WARNING: ') + message);
 };
 
 /**
@@ -76,7 +85,7 @@ export const shawWarn = (message: string): void => {
  * @param message
  */
 export const shawFail = (message: string): void => {
-  console.log('\n' + chalk.redBright('[✖️ FAILED]: ') + message);
+  console.log(chalk.redBright(`✖️ FAILED: ${message}`));
 };
 
 /**
