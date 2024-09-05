@@ -11,16 +11,7 @@ import chalk from 'chalk';
 import fetch from 'node-fetch-native';
 import ora, { type Ora } from 'ora';
 
-import { shawFail, shawIntro, shawLine, shawMessage } from './prompts';
-
-export const introduce = () => {
-  shawIntro('Thank you for using pkg compose.');
-  shawMessage(
-    'If you have any issues, please create an issue on ' +
-      chalk.underline('https://github.com/shaw996/pkg-compose/issues'),
-  );
-  shawLine();
-};
+import { shawFail, shawMessage } from './prompts';
 
 /**
  * Create ora spinner
