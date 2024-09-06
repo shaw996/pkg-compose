@@ -79,6 +79,7 @@ export const runCmd = async (cmd: string, runCmdOptions?: RunCmdOptions) => {
     exec(cmd, (err, stdout) => {
       if (err) {
         if (fail) {
+          spinner.stop();
           fail(err.message);
         } else {
           shawFail(`Run "${cmd}" failed\n${err.message}`);

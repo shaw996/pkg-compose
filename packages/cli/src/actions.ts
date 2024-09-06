@@ -20,7 +20,8 @@ import {
 import { downloadFile, fetchFile, runCmd } from './utils';
 
 export interface ComposeRunActionOptions {
-  config?: string;
+  config: string;
+  manager: PkgConfig['manager'];
 }
 
 interface ComposeDepOptions {
@@ -33,11 +34,12 @@ interface ComposeDepOptions {
 }
 
 export interface ComposeOptions {
-  name: string;
   description: string;
   dev_dependencies?: {
     [name: string]: ComposeDepOptions;
   };
+  manager: PkgConfig['manager'];
+  name: string;
   remote: string[];
 }
 
@@ -160,7 +162,14 @@ const mergeObject = (
  * @param yamlText
  */
 const recognizePkgCompose = async (manager: PkgConfig['manager'], pkgCompose: string) => {
-  const { description, dev_dependencies = {}, name } = parse(pkgCompose) as ComposeOptions;
+  const {
+    description,
+    dev_dependencies = {},
+    manager: pcManager,
+    name,
+  } = parse(pkgCompose) as ComposeOptions;
+
+  manager = manager ? manager : pcManager ? pcManager : 'npm';
 
   // pkgcompose's info
   const desc = description ? chalk.grey(' ' + description) : '';
@@ -262,30 +271,52 @@ const recognizePkgCompose = async (manager: PkgConfig['manager'], pkgCompose: st
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
 export const runAction = async (options: ComposeRunActionOptions) => {
-  const pkgconfig: PkgConfig = JSON.parse(readFileSync(PKGCONFIG_JSON_PATH, { encoding: 'utf-8' }));
+  if (options.config) {
+    options.manager = options.manager ?? 'npm';
 
-  if (!pkgconfig.pkgComposes || !pkgconfig.pkgComposes.length) {
-    return;
-  }
+    let pkgComposeText: string;
 
-  shawIntroduce();
+    if (/^http(s):\/\/+?/.test(options.config)) {
+      const resp = await fetchFile(options.config);
 
-  pkgconfig.manager = pkgconfig.manager ?? 'npm';
-  shawMessage(`Use manager: ` + chalk.bgCyanBright(pkgconfig.manager));
-  shawLine();
-
-  for await (const url of pkgconfig.pkgComposes) {
-    const resp = await fetchFile(url);
-
-    if (resp.status === 404) {
-      shawFail(`404 Not Found: ${url}`);
-      continue;
+      if (resp.status === 404) {
+        shawFail(`404 Not Found: ${options.config}`);
+      }
+      pkgComposeText = await resp.text();
+    } else {
+      pkgComposeText = readFileSync(resolve(process.cwd(), options.config), { encoding: 'utf-8' });
     }
 
-    const pkgComposeText = await resp.text();
-
-    await recognizePkgCompose(pkgconfig.manager, pkgComposeText);
+    await recognizePkgCompose(options.manager, pkgComposeText);
     shawLine();
+  } else {
+    const pkgconfig: PkgConfig = JSON.parse(
+      readFileSync(PKGCONFIG_JSON_PATH, { encoding: 'utf-8' }),
+    );
+
+    if (!pkgconfig.pkgComposes || !pkgconfig.pkgComposes.length) {
+      return;
+    }
+
+    shawIntroduce();
+
+    pkgconfig.manager = pkgconfig.manager ?? 'npm';
+    shawMessage(`Use manager: ` + chalk.bgCyanBright(pkgconfig.manager));
+    shawLine();
+
+    for await (const url of pkgconfig.pkgComposes) {
+      const resp = await fetchFile(url);
+
+      if (resp.status === 404) {
+        shawFail(`404 Not Found: ${url}`);
+        continue;
+      }
+
+      const pkgComposeText = await resp.text();
+
+      await recognizePkgCompose(pkgconfig.manager, pkgComposeText);
+      shawLine();
+    }
   }
 };
 

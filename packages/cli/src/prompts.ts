@@ -10,10 +10,10 @@ import { DEFAULT_COLORS, INFO_COLOR } from './constants';
 export const gradient = gradientString(...DEFAULT_COLORS);
 
 export const shawIntroduce = () => {
-  shawGradient('Thank you for using pkg-compose.');
-  shawGradient(
-    'If you have any issues, please create an issue on ' +
-      chalk.underline('https://github.com/shaw996/pkg-compose/issues.'),
+  shawGradient('Thank you for using "pkgc".');
+  shawMessage(
+    gradient('If you have any questions, please create issues on: ') +
+      chalk.underline('https://github.com/shaw996/pkg-compose/issues'),
   );
   shawLine();
 };

@@ -23,8 +23,8 @@ pkgCompose
   .allowUnknownOption()
   .action(createDefaultAction(['generate', 'run'], 'pkgc'));
 
-// pkgc r [-c --config]
-// pkgc run [-c --config]
+// pkgc r [-c --config] [path] [-m --manager] [packageManager]
+// pkgc run [-c --config] [path] [-m --manager] [packageManager]
 pkgCompose
   .command('run')
   .alias('r')
@@ -32,6 +32,7 @@ pkgCompose
   .usage('[command]')
   .helpOption('-h, --help', 'Display help for command')
   .option('-c --config [string]', "Use particular pkg-compose.yaml's url")
+  .option('-m --manager [string]', 'Specify package manager, e.g., npm, pnpm, yarn')
   .allowUnknownOption(false)
   .action(runAction);
 
