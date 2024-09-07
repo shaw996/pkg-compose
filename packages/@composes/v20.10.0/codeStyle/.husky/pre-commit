@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+if [ -t 2 ]; then 
+  exec > /dev/tty
+  2>&1
+fi
+
+npx lint-staged -c .lintstagedrc.mjs

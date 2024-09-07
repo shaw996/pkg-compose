@@ -1,0 +1,19 @@
+name: Code Style工具集合
+description: 前端用于进行代码风格检查、修复的工具集合
+dev_dependencies:
+  'lint-staged':
+    name: 'lint-staged'
+    version: 15.2.9
+    description: 增量检查Git暂存区的文件
+    configuration:
+      .lintstagedrc.mjs: https://raw.githubusercontent.com/shaw996/pkg-compose/main/packages/%40composes/v20.10.0/codeStyle/.lintstagedrc.mjs
+  husky:
+    name: husky
+    version: 9.1.5
+    description: 用于在 Git 操作（如 commit、push 等）之前或之后运行脚本的工具
+    postinstall: npx husky install
+    package_json:
+      scripts:
+        prepare: npx husky install
+    configuration:
+      .husky/pre-commit: https://raw.githubusercontent.com/shaw996/pkg-compose/main/packages/%40composes/v20.10.0/codeStyle/.husky/pre-commit
