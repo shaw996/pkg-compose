@@ -1,6 +1,52 @@
 name: Code Style工具集合
 description: 前端用于进行代码风格检查、修复的工具集合
 dev_dependencies:
+  eslint:
+    name: eslint
+    version: 8.57.0
+    description: 一个用于识别和报告 JavaScript 代码中问题的工具，目的是使代码更加一致并避免错误
+    configuration:
+      .eslintignore: https://raw.githubusercontent.com/shaw996/pkg-compose/main/packages/%40composes/v20.10.0/codeStyle/.eslintignore
+      .eslintrc: https://raw.githubusercontent.com/shaw996/pkg-compose/main/packages/%40composes/v20.10.0/codeStyle/.eslintrc
+  eslint-config-prettier:
+    name: eslint-config-prettier
+    version: 9.1.0
+    description: 一个 ESLint 配置包，通过禁用所有与 Prettier 格式化规则冲突的 ESLint 规则解决 ESLint 和 Prettier 之间的冲突
+  eslint-import-resolver-typescript:
+    name: eslint-import-resolver-typescript
+    version: 3.6.1
+    description: 一个用于 ESLint 的插件，专门用于解决 TypeScript 项目中的模块解析问题
+  eslint-plugin-import:
+    name: eslint-plugin-import
+    version: 2.29.1
+    description: 一个用于 ESLint 的插件，专注于检查和规范 JavaScript 和 TypeScript 项目中的模块导入和导出
+  eslint-plugin-prettier:
+    name: eslint-plugin-prettier
+    version: 5.2.1
+    description: 一个用于 ESLint 的插件，它将 Prettier 的格式化规则集成到 ESLint 中，使得 Prettier 的格式化规则可以作为 ESLint 的规则来执行
+  eslint-plugin-sort-destructure-keys:
+    name: eslint-plugin-sort-destructure-keys
+    version: 2.0.0
+    description: 一个用于 ESLint 的插件，它提供了一个规则，用于确保在解构赋值时，对象的键按照字母顺序进行排序
+  eslint-plugin-sort-keys-fix:
+    name: eslint-plugin-sort-keys-fix
+    version: 1.1.2
+    description: 一个用于 ESLint 的插件，它提供了一个规则，用于确保对象的键按照字母顺序进行排序，并且可以自动修复不符合规则的代码
+  eslint-plugin-unicorn:
+    name: eslint-plugin-unicorn
+    version: 55.0.0
+    description: 一个用于 ESLint 的插件，它提供了大量额外的规则，旨在帮助开发者编写更安全、更简洁、更现代的 JavaScript 代码
+  eslint-plugin-unused-imports:
+    name: eslint-plugin-unused-imports
+    version: 4.1.3
+    description: 一个用于 ESLint 的插件，它专注于检测和报告未使用的导入
+  prettier:
+    name: prettier
+    version: 3.3.3
+    description: 一个代码格式化工具，主要用于统一代码风格，使代码在团队中保持一致的格式
+    configuration:
+      .prettierignore: https://raw.githubusercontent.com/shaw996/pkg-compose/main/packages/%40composes/v20.10.0/codeStyle/.prettierignore
+      .prettierrc: https://raw.githubusercontent.com/shaw996/pkg-compose/main/packages/%40composes/v20.10.0/codeStyle/.prettierrc
   'lint-staged':
     name: 'lint-staged'
     version: 15.2.9
