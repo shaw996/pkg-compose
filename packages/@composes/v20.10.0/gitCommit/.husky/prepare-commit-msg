@@ -1,2 +1,4 @@
 #!/usr/bin/env sh
-exec < /dev/tty && npx --no-install git-cz --hook
+if [ "$1" = ".git/COMMIT_EDITMSG" ] && { [ -z "$2" ] || [ "$2" = "message" ]; }; then
+  exec < /dev/tty && npx --no-install git-cz --hook
+fi

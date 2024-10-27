@@ -8,6 +8,18 @@ dev_dependencies:
     configuration:
       .eslintignore: https://raw.githubusercontent.com/shaw996/pkg-compose/main/packages/%40composes/v20.10.0/codeStyle/.eslintignore
       .eslintrc: https://raw.githubusercontent.com/shaw996/pkg-compose/main/packages/%40composes/v20.10.0/codeStyle/.eslintrc
+  @typescript-eslint/parser:
+    name: @typescript-eslint/parser
+    version: 8.11.0
+    description: Eslint typescript解析器
+  @typescript-eslint/eslint-plugin:
+    name: @typescript-eslint/eslint-plugin
+    version: 8.11.0
+    description: Eslint typescript插件
+  eslint-config-prettier:
+    name: eslint-config-prettier
+    version: 9.1.0
+    description: 一个 ESLint 配置包，通过禁用所有与 Prettier 格式化规则冲突的 ESLint 规则解决 ESLint 和 Prettier 之间的冲突
   eslint-config-prettier:
     name: eslint-config-prettier
     version: 9.1.0
