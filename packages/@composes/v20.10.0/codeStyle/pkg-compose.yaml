@@ -8,12 +8,12 @@ dev_dependencies:
     configuration:
       .eslintignore: https://raw.githubusercontent.com/shaw996/pkg-compose/main/packages/%40composes/v20.10.0/codeStyle/.eslintignore
       .eslintrc: https://raw.githubusercontent.com/shaw996/pkg-compose/main/packages/%40composes/v20.10.0/codeStyle/.eslintrc
-  '@typescript-eslint/parser':
-    name: '@typescript-eslint/parser'
+  "@typescript-eslint/parser":
+    name: "@typescript-eslint/parser"
     version: 8.11.0
     description: Eslint typescript解析器
-  '@typescript-eslint/eslint-plugin':
-    name: '@typescript-eslint/eslint-plugin'
+  "@typescript-eslint/eslint-plugin":
+    name: "@typescript-eslint/eslint-plugin"
     version: 8.11.0
     description: Eslint typescript插件
   eslint-config-prettier:
