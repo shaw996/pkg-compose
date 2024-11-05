@@ -20,10 +20,6 @@ dev_dependencies:
     name: eslint-config-prettier
     version: 9.1.0
     description: 一个 ESLint 配置包，通过禁用所有与 Prettier 格式化规则冲突的 ESLint 规则解决 ESLint 和 Prettier 之间的冲突
-  eslint-config-prettier:
-    name: eslint-config-prettier
-    version: 9.1.0
-    description: 一个 ESLint 配置包，通过禁用所有与 Prettier 格式化规则冲突的 ESLint 规则解决 ESLint 和 Prettier 之间的冲突
   eslint-import-resolver-typescript:
     name: eslint-import-resolver-typescript
     version: 3.6.1
